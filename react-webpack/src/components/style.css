@@ -1,0 +1,171 @@
+/* CurentStatus css  */
+
+.current-status-card {
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  color: white;
+  background: #555; /* Màu dự phòng */
+  max-width: 320px;
+  margin: 20px auto; /* Tự động căn giữa */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease;
+}
+
+.aqi-value-large {
+  font-size: 4.5rem; /* 72px */
+  font-weight: 700;
+  line-height: 1;
+}
+
+.aqi-level {
+  font-size: 1.75rem; /* 28px */
+  font-weight: 500;
+  margin-top: 10px;
+  text-transform: uppercase;
+}
+
+.timestamp {
+  font-size: 0.9rem;
+  margin-top: 15px;
+  opacity: 0.9;
+}
+
+/* Các lớp màu động dựa trên chỉ số AQI */
+.aqi-green { background: #28a745; }
+.aqi-yellow { background: #ffc107; color: #333; } 
+.aqi-orange { background: #fd7e14; }
+.aqi-red { background: #dc3545; }
+.aqi-purple { background: #6f42c1; }
+.aqi-maroon { background: #8b0000; }
+
+/* bo sung  */
+.fallback-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  opacity: 0.9;
+  margin-top: 5px;
+}
+
+.health-advice {
+  font-size: 0.95rem; /* 15px */
+  font-weight: 500;
+  margin-top: 20px;
+  padding-top: 15px;
+  /* Đường kẻ ngăn cách (màu trắng mờ) */
+  border-top: 1px solid rgba(255, 255, 255, 0.3); 
+  line-height: 1.4;
+  text-align: left; /* Căn lề trái cho dễ đọc lời khuyên */
+}
+
+/* Trường hợp đặc biệt: nền vàng chữ đen */
+.aqi-yellow .health-advice {
+  /* Đường kẻ ngăn cách (màu đen mờ) */
+  border-top-color: rgba(0, 0, 0, 0.2); 
+}
+
+
+
+/* PollutantDetails.css */
+.details-container {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 25px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.details-container h3 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.details-grid {
+  display: grid;
+  /* * Tạo các cột tự động:
+   * - Tối thiểu 120px
+   * - Tối đa 1fr (chia đều không gian còn lại)
+   * - Nó sẽ tự động ngắt dòng trên điện thoại
+   */
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 16px; /* Khoảng cách giữa các ô */
+}
+
+.detail-item {
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  padding: 12px;
+  text-align: center;
+  border: 1px solid #e9ecef;
+}
+
+.detail-name {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #555;
+  margin-bottom: 5px;
+}
+
+.detail-value {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111;
+}
+
+.detail-unit {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: #666;
+  margin-left: 4px;
+}
+
+/* HistoryChart.css */
+
+.history-chart-container {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 25px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.history-chart-container h3 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.param-selector {
+  display: flex;
+  flex-wrap: wrap; /* Cho phép xuống dòng trên điện thoại */
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+.param-button {
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  background-color: #f8f9fa;
+  color: #555;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.param-button:hover {
+  background-color: #e9ecef;
+  border-color: #bbb;
+}
+
+.param-button.active {
+  /* Style cho nút đang được chọn */
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}

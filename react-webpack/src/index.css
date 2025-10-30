@@ -1,0 +1,30 @@
+/* 1. Reset CSS cơ bản */
+*, *::before, *::after {
+  box-sizing: border-box; /* Giúp việc tính toán layout (width/height) dễ dàng hơn */
+  margin: 0;
+  padding: 0;
+}
+
+/* 2. Style cho toàn bộ trang (body) */
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, 
+               "Helvetica Neue", Arial, sans-serif;
+  
+  background-color: #f4f7f6;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* 3. Style cho container chính (từ file App.js) */
+.container {
+  width: 90%; /* Chiếm 90% chiều rộng màn hình */
+  max-width: 1200px;
+  margin: 20px auto; /* Tự động căn giữa */
+  padding: 20px;
+}
+
+/* 4. Style mặc định cho các tiêu đề (tùy chọn nhưng nên có) */
+h1, h2, h3, h4, h5, h6 {
+  margin-bottom: 1rem;
+  line-height: 1.3;
+}

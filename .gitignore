@@ -1,0 +1,8 @@
+# Bỏ qua các thư viện
+react-webpack/node_modules
+
+# Bỏ qua code đã build
+react-webpack/build
+
+# Bỏ qua file biến môi trường
+react-webpack/.env
