@@ -1,98 +1,149 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-
-// Import các component con
+// 1. IMPORT CÁC THƯ VIỆN/COMPONENT MỚI
+import Select from 'react-select'; // (Từ 'npm install react-select')
+import AQIMap from './AQIMap'; 
+// (Import các component con cũ)
 import CurrentStatus from './CurrentStatus';
 import PollutantDetails from './PollutantDetails';
 import HistoryChart from './HistoryChart';
 
+// Hàm helper để lấy ngày hôm nay/7 ngày trước cho Bộ lọc Thời gian
+const getISODate = (offsetDays = 0) => {
+  const date = new Date();
+  date.setDate(date.getDate() + offsetDays);
+  return date.toISOString().split('T')[0]; // Format chuẩn: YYYY-MM-DD
+};
+
 function Dashboard() {
-  // === State ===
-  const [city, setCity] = useState(''); 
-  const [locations, setLocations] = useState([]);
-  const [data, setData] = useState([]); 
-  const [loading, setLoading] = useState(true); 
+  // === 2. NÂNG CẤP STATE ===
+  
+  // State quản lý danh sách địa điểm (lấy từ /api/locations)
+  const [locations, setLocations] = useState([]); // Ví dụ: [{ value: '@123', label: 'Vũng Tàu' }]
+  
+  // State quản lý các địa điểm ĐANG CHỌN (có thể nhiều)
+  const [selectedCities, setSelectedCities] = useState([]); // Ví dụ: [{ value: 'hanoi', ... }]
+  
+  // State cho Bộ lọc Thời gian
+  const [fromDate, setFromDate] = useState(getISODate(-7)); // 7 ngày trước
+  const [toDate, setToDate] = useState(getISODate(1));   // +1 ngày (để bao gồm cả ngày hôm nay)
+  
+  // State dữ liệu (giờ là 1 object, không còn là mảng)
+  // Ví dụ: { 'hanoi': [...data...], '@14642': [...data...] }
+  const [data, setData] = useState({});
+  
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // === useEffect ===
-
+  // === useEffect 1: Lấy danh sách địa điểm (Chạy 1 lần) ===
   useEffect(() => {
-    // Chạy 1 lần duy nhất khi component tải
     const fetchLocations = async () => {
       try {
         const res = await axios.get('/api/locations');
-        setLocations(res.data); // Lưu danh sách vào state
+        // Chuyển đổi format cho 'react-select'
+        const options = res.data.map(loc => ({
+          value: loc.locationId, // ID (ví dụ: 'hanoi', '@14642')
+          label: loc.displayName   // Tên (ví dụ: 'Hà Nội (Tổng hợp)')
+        }));
         
-        // Tự động chọn địa điểm đầu tiên trong danh sách làm mặc định
-        if (res.data && res.data.length > 0) {
-          // (Chúng ta sẽ tự động chọn 'hanoi' nếu có)
-          const hanoi = res.data.find(loc => loc.locationId === 'hanoi');
-          if (hanoi) {
-            setCity(hanoi.locationId);
-          } else {
-            setCity(res.data[0].locationId); // Hoặc chọn cái đầu tiên
-          }
-        } else {
-          setLoading(false); // Không có địa điểm nào để tải
+        setLocations(options);
+        
+        // Tự động chọn Hà Nội làm mặc định khi tải trang
+        if (options.length > 0) {
+          const hanoi = options.find(o => o.value === 'hanoi');
+          setSelectedCities(hanoi ? [hanoi] : [options[0]]); // Chọn Hà Nội
         }
       } catch (err) {
         console.error("Lỗi khi tải địa điểm:", err);
         setError(err.message);
-        setLoading(false);
+      } finally {
+        // (Loading sẽ được set 'false' ở useEffect 2)
       }
     };
-    
     fetchLocations();
   }, []); // [] = Chạy 1 lần khi mount
 
-  // Tự động gọi API khi 'city' thay đổi
+  
+  // === useEffect 2: Lấy dữ liệu đo lường (Chạy khi thay đổi) ===
   useEffect(() => {
-    // Chỉ chạy nếu 'city' đã được chọn (không phải chuỗi rỗng)
-    if (!city) {
-      // Nếu không có city, không cần loading, chỉ cần set data rỗng
-      setData([]);
+    // Chỉ chạy nếu có địa điểm được chọn VÀ có ngày
+    if (selectedCities.length === 0 || !fromDate || !toDate) {
       setLoading(false);
-      return; 
+      setData({}); // Xóa data cũ
+      return;
     }
 
     const fetchData = async () => {
-      setLoading(true); 
-      setError(null);   
+      setLoading(true);
+      setError(null);
+      
       try {
-        const res = await axios.get(`/api/measurements?city=${city}&limit=200`);
-        setData(res.data.results);
+        // Tạo một mảng các "lời hứa" (promises)
+        // Mỗi 'promise' là một API call cho 1 thành phố
+        const promises = selectedCities.map(city =>
+          axios.get('/api/measurements', {
+            params: {
+              city: city.value, // city.value là ID ('hanoi', '@14642')
+              from: fromDate,   // Gửi 'from' (từ ngày)
+              to: toDate,       // Gửi 'to' (đến ngày)
+              // Bỏ 'limit=200'. API sẽ trả về TẤT CẢ data trong khoảng ngày
+            }
+          })
+        );
+        
+        // Chờ tất cả API call hoàn thành
+        const responses = await Promise.all(promises);
+        
+        // Biến mảng kết quả thành 1 object
+        const newData = {};
+        responses.forEach((res, index) => {
+          const cityId = selectedCities[index].value;
+          newData[cityId] = res.data.results; // Ví dụ: { 'hanoi': [...], '@14642': [...] }
+        });
+
+        setData(newData); // Cập nhật state dữ liệu chính
+        
       } catch (err) {
-        console.error("Lỗi khi gọi API:", err);
+        console.error("Lỗi khi gọi API đo lường:", err);
         setError(err.message);
       } finally {
-        setLoading(false); 
+        setLoading(false); // Hoàn thành tải
       }
     };
 
-    fetchData(); 
-  }, [city]); // <-- Chạy lại khi 'city' thay đổi
+    fetchData();
+  }, [selectedCities, fromDate, toDate]); // <-- Chạy lại khi 3 state này thay đổi
 
-  
-  // === Render ===
+
+  // === 3. NÂNG CẤP HÀM RENDER ===
   const renderContent = () => {
-    if (loading) {
-      return <p>Đang tải dữ liệu cho {city}...</p>;
+    if (loading) return <p>Đang tải dữ liệu...</p>;
+    if (error) return <p>Lỗi: {error}</p>;
+    if (Object.keys(data).length === 0) {
+      return <p>Vui lòng chọn địa điểm.</p>;
     }
 
-    if (error) {
-      return <p>Lỗi: {error}</p>;
-    }
-
-    if (data.length === 0) {
-      return <p>Không tìm thấy dữ liệu cho {city}.</p>;
-    }
-
-    // Nếu có dữ liệu, ta sẽ render các component con
     return (
       <div>
-        <CurrentStatus data={data} />
-        <PollutantDetails data={data} />
-        <HistoryChart data={data} />
+        {/* Logic mới: Hiển thị 1 thẻ cho MỖI thành phố được chọn */}
+        <div className="current-status-grid">
+          {selectedCities.map(city => {
+            const cityData = data[city.value] || []; // Lấy data của thành phố này
+            return cityData.length > 0 ? (
+              <CurrentStatus key={city.value} data={cityData} />
+            ) : (
+              <p key={city.value}>Không có dữ liệu cho {city.label}</p>
+            );
+          })}
+        </div>
+        
+        {/* Logic mới: Chỉ hiển thị chi tiết nếu 1 thành phố được chọn */}
+        {selectedCities.length === 1 && (
+          <PollutantDetails data={data[selectedCities[0].value] || []} />
+        )}
+        
+        {/* Truyền props (dạng object) mới cho Biểu đồ */}
+        <HistoryChart data={data} selectedCities={selectedCities} />
       </div>
     );
   };
@@ -101,28 +152,44 @@ function Dashboard() {
     <div className="dashboard-container">
       <h1>Dashboard Chất lượng không khí</h1>
       
-      <div className="controls">
-        <label>Chọn địa điểm: </label>
+      {/* 4. THÊM COMPONENT BẢN ĐỒ */}
+      <AQIMap />
+
+      {/* 5. NÂNG CẤP BỘ LỌC (CONTROLS) */}
+      <div className="controls-grid">
+        {/* Dropdown chọn nhiều (Tính năng So sánh) */}
+        <div className="control-item">
+          <label>Chọn Địa điểm (có thể chọn nhiều)</label>
+          <Select
+            isMulti // Cho phép chọn nhiều
+            options={locations}
+            isLoading={locations.length === 0}
+            value={selectedCities}
+            onChange={(selectedOptions) => setSelectedCities(selectedOptions || [])}
+            placeholder="Chọn hoặc so sánh các địa điểm..."
+          />
+        </div>
         
-        {/* === BẮT ĐẦU SỬA: TẠO DROPDOWN ĐỘNG === */}
-        <select value={city} onChange={(e) => setCity(e.target.value)}>
-          {/* Bây giờ dropdown sẽ tự động điền (render)
-            danh sách địa điểm lấy từ database (API)
-          */}
-          {locations.length === 0 ? (
-            <option disabled value="">Đang tải địa điểm...</option>
-          ) : (
-            locations.map(loc => (
-              <option key={loc.locationId} value={loc.locationId}>
-                {/* Dùng 'displayName' từ DB, ví dụ: "Hà Nội (Tổng hợp)" */}
-                {loc.displayName} 
-              </option>
-            ))
-          )}
-        </select>
-        {/* === KẾT THÚC SỬA === */}
+        {/* Bộ lọc Thời gian (Date Filter) */}
+        <div className="control-item">
+          <label>Từ ngày</label>
+          <input 
+            type="date" 
+            value={fromDate}
+            onChange={(e) => setFromDate(e.target.value)}
+          />
+        </div>
+        <div className="control-item">
+          <label>Đến ngày</label>
+          <input 
+            type="date" 
+            value={toDate}
+            onChange={(e) => setToDate(e.target.value)}
+          />
+        </div>
       </div>
 
+      {/* Vùng hiển thị nội dung chính */}
       <div className="main-content">
         {renderContent()}
       </div>

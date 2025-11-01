@@ -1,5 +1,14 @@
 import React, { useState, useMemo } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { 
+  LineChart, 
+  Line, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  Legend, 
+  ResponsiveContainer 
+} from 'recharts';
 import './style.css';
 
 // Các tham số mà chúng ta cho phép vẽ biểu đồ
@@ -12,42 +21,78 @@ const CHARTABLE_PARAMS = [
   { key: 't', name: 'Nhiệt độ' },
 ];
 
-function HistoryChart({ data }) {
-  // State để lưu tham số đang được chọn (mặc định là 'aqi')
+// Mảng màu cho các đường line (để so sánh)
+const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#dc3545', '#007bff'];
+
+/**
+ * Props mới (đã nâng cấp):
+ * data: { 'hanoi': [...], '@14642': [...] } (Object)
+ * selectedCities: [{ value: 'hanoi', label: 'Hà Nội' }, ...] (Array)
+ */
+function HistoryChart({ data, selectedCities }) {
   const [selectedParam, setSelectedParam] = useState('aqi');
 
-  // useMemo dùng để lọc và chuẩn bị dữ liệu
-  // Nó chỉ chạy lại khi 'data' hoặc 'selectedParam' thay đổi
+  // useMemo để chuẩn bị dữ liệu cho biểu đồ so sánh
   const chartData = useMemo(() => {
-    return data
-      // 1. Lọc lấy các bản ghi khớp với tham số đã chọn
-      .filter(item => item.parameter === selectedParam)
-      // 2. Format lại 'timestamp' cho dễ đọc trên biểu đồ
-      .map(item => ({
-        ...item,
-        // Format: "26/10 21:00"
-        time: new Date(item.timestamp).toLocaleString('vi-VN', {
-          day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
-        })
-      }))
-      // 3. Đảo ngược mảng (vì API trả về mới nhất -> cũ nhất)
-      // Biểu đồ cần cũ nhất -> mới nhất (trái -> phải)
-      .reverse(); 
-  }, [data, selectedParam]);
+    
+    // 1. Tạo một "kho" để gộp dữ liệu
+    // Ví dụ: { '1678886400000': { timestamp: ..., time: '...', 'Hà Nội': 50, 'Vũng Tàu': 30 } }
+    const combinedData = {};
+    
+    // 2. Duyệt qua từng thành phố ĐÃ CHỌN
+    // (Kiểm tra 'selectedCities' có tồn tại không)
+    if (!selectedCities || selectedCities.length === 0) {
+      return [];
+    }
 
-  // Lấy ra tên "đẹp" (ví dụ: "PM2.5") để hiển thị
+    for (const city of selectedCities) {
+      const cityId = city.value;
+      const cityName = city.label.split(' (')[0]; // Lấy tên ngắn (ví dụ: 'Hà Nội')
+      
+      // 3. Kiểm tra xem 'data' (là Object) có dữ liệu cho thành phố này không
+      if (data[cityId]) {
+        // 4. Lọc lấy các bản ghi khớp với tham số (ví dụ: 'pm25')
+        // (data[cityId] là một Mảng, nên .filter() hoạt động)
+        const filteredCityData = data[cityId].filter(item => item.parameter === selectedParam);
+        
+        // 5. Thêm dữ liệu của thành phố này vào "kho"
+        for (const item of filteredCityData) {
+          const timestamp = item.timestamp; // Dùng timestamp gốc làm key
+          
+          if (!combinedData[timestamp]) {
+            combinedData[timestamp] = {
+              timestamp: timestamp,
+              time: new Date(timestamp).toLocaleString('vi-VN', {
+                day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
+              })
+            };
+          }
+          
+          combinedData[timestamp][cityName] = item.value;
+        }
+      }
+    }
+
+    // 6. Chuyển "kho" (Object) thành mảng (Array) và sắp xếp theo thời gian
+    const sortedArray = Object.values(combinedData).sort((a, b) => 
+      new Date(a.timestamp) - new Date(b.timestamp)
+    );
+
+    return sortedArray;
+
+  }, [data, selectedCities, selectedParam]); // Chạy lại khi 3 thứ này thay đổi
+
   const currentParamInfo = CHARTABLE_PARAMS.find(p => p.key === selectedParam);
 
   return (
     <div className="history-chart-container">
-      <h3>Biểu đồ Lịch sử</h3>
+      <h3>Biểu đồ Lịch sử ({currentParamInfo?.name})</h3>
       
-      {/* Các nút để chọn tham số */}
+      {/* Các nút để chọn tham số (Giữ nguyên) */}
       <div className="param-selector">
         {CHARTABLE_PARAMS.map(param => (
           <button
             key={param.key}
-            // Nếu nút được chọn, thêm class 'active'
             className={`param-button ${selectedParam === param.key ? 'active' : ''}`}
             onClick={() => setSelectedParam(param.key)}
           >
@@ -57,28 +102,34 @@ function HistoryChart({ data }) {
       </div>
 
       {chartData.length > 0 ? (
-        // ResponsiveContainer giúp biểu đồ co giãn theo kích thước
-        <ResponsiveContainer width="100%" height={300}>
+        <ResponsiveContainer width="100%" height={350}>
           <LineChart
             data={chartData}
             margin={{ top: 5, right: 20, left: -20, bottom: 5 }}
           >
             <CartesianGrid strokeDasharray="3 3" stroke="#ccc" />
-            {/* Trục X (thời gian) */}
-            <XAxis dataKey="time" fontSize={12} />
-            {/* Trục Y (giá trị) */}
+            <XAxis dataKey="time" fontSize={12} minTickGap={15} />
             <YAxis fontSize={12} />
-            {/* Tooltip khi di chuột vào */}
             <Tooltip />
             <Legend />
-            <Line 
-              type="monotone" 
-              dataKey="value" // Dữ liệu của trục Y
-              name={currentParamInfo?.name || 'Giá trị'} // Tên "đẹp"
-              stroke="#8884d8" 
-              strokeWidth={2}
-              dot={false}
-            />
+            
+            {/* Vẽ nhiều line động (Giữ nguyên) */}
+            {selectedCities.map((city, index) => {
+              const cityName = city.label.split(' (')[0]; // Tên ngắn
+              return (
+                <Line 
+                  key={city.value}
+                  type="monotone" 
+                  dataKey={cityName} 
+                  name={cityName}     
+                  stroke={COLORS[index % COLORS.length]}
+                  strokeWidth={2}
+                  dot={false}
+                  connectNulls 
+                />
+              );
+            })}
+            
           </LineChart>
         </ResponsiveContainer>
       ) : (
@@ -89,3 +140,4 @@ function HistoryChart({ data }) {
 }
 
 export default HistoryChart;
+

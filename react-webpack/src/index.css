@@ -28,3 +28,44 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 1rem;
   line-height: 1.3;
 }
+
+/*5 Grid cho các bộ lọc */
+.controls-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr; /* Cột 1 rộng, 2 cột sau hẹp */
+  gap: 20px;
+  align-items: flex-end;
+  margin-top: 25px;
+  margin-bottom: 25px;
+}
+
+.control-item label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+/* Style cho input ngày */
+.control-item input[type="date"] {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+/* Grid cho các thẻ CurrentStatus (khi so sánh) */
+.current-status-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+/* Tinh chỉnh thẻ CurrentStatus để vừa vặn trong grid */
+.current-status-card {
+  margin: 0; /* Bỏ margin 'auto' cũ */
+  width: 100%;
+  max-width: none;
+}

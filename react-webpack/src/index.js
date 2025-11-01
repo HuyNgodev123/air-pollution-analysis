@@ -2,7 +2,7 @@ import React from 'react' // nạp thư viện react
 import ReactDOM from 'react-dom/client' // nạp thư viện react-dom
 import Dashboard from './components/Dashboard'
 import './index.css'
-
+import 'leaflet/dist/leaflet.css';
 // Tạo component App
 function App() {
     return (

@@ -169,3 +169,27 @@
   color: white;
   border-color: #007bff;
 }
+
+
+
+/* AQIMap.css */
+.map-container {
+  margin-top: 25px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.map-container h3 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Quan trọng: Đặt chiều cao cho Leaflet container */
+.leaflet-container {
+  height: 450px;
+  width: 100%;
+  border-radius: 8px;
+}
+
