@@ -258,3 +258,137 @@
   border-radius: 8px;
 }
 
+
+
+
+/* PollutantInfoTabs.js */
+.tabs-section-container {
+  width: 100%;
+  margin-top: 2.5rem;
+  margin-bottom: 2.5rem;
+}
+
+/* 1. "Cửa sổ" (Window)
+   BẮT BUỘC phải có overflow: hidden để giấu các thẻ khác */
+.tabs-content-wrapper {
+  overflow: hidden;
+}
+
+/* 2. "Thanh trượt" (Track)
+   Chứa TẤT CẢ các thẻ, di chuyển bằng 'transform' */
+.tabs-track {
+  display: flex; /* Xếp các thẻ nằm ngang */
+  list-style-type: none; /* Bỏ dấu chấm của <li> */
+  padding: 0;
+  margin: 0;
+  
+  /* * Căn lề thẻ đầu tiên.
+   * Thẻ rộng 80%, vậy 20% còn lại chia 2 bên = 10%.
+   * Thêm 10px để thẻ bên phải "ló" ra 20px (vì margin-right là 20px)
+   * (10% + 10px)
+  */
+  padding-left: calc(10% + 10px); 
+  
+  /* Đây là 'animation' trượt (rất mượt) */
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 3. Các thẻ (Card) bên trong */
+.tab-content-card {
+  display: flex;
+  flex-direction: column; /* Xếp dọc (ảnh trên, chữ dưới) trên di động */
+  
+  /* Kích thước: 80% chiều rộng "cửa sổ" */
+  width: 80%; 
+  flex-shrink: 0; /* Không bị co lại */
+  margin-right: 20px; /* Khoảng cách giữa các thẻ */
+  
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.07);
+  overflow: hidden;
+  
+  /* 4. HIỆU ỨNG MỜ (FADE) */
+  opacity: 0.4; /* Mặc định mờ đi (như trong ảnh) */
+  transform: scale(0.98); /* Nhỏ đi một chút */
+  transition: all 0.5s ease-out;
+}
+
+/* 5. Thẻ đang "Active" */
+.tab-content-card.active {
+  opacity: 1; /* Rõ 100% */
+  transform: scale(1); /* Kích thước chuẩn */
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1); /* Bóng đổ đậm hơn */
+}
+
+/* Responsive (cho máy tính) */
+@media (min-width: 768px) {
+  .tab-content-card {
+    flex-direction: row; /* Xếp ngang (ảnh trái, chữ phải) */
+    min-height: 400px;
+  }
+}
+
+/* (Các style cho nội dung bên trong thẻ giữ nguyên) */
+.content-image-col { flex: 1; }
+.content-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.content-text-col {
+  flex: 1;
+  padding: 2rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.content-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #1a202c;
+  margin-bottom: 1rem;
+}
+.content-description {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #4a5568;
+}
+
+
+/* 6. Thanh điều hướng (Tabs) (Giữ nguyên) */
+.tabs-nav-bar {
+  display: flex;
+  /* Cho phép cuộn ngang trên điện thoại nếu không đủ chỗ */
+  overflow-x: auto; 
+  justify-content: flex-start; /* Bắt đầu từ bên trái */
+  
+  width: 100%;
+  margin-top: 2rem;
+  padding: 0 1rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+.tab-button {
+  border: none;
+  background-color: transparent;
+  padding: 1rem 0.5rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #a0aec0; /* Màu mờ */
+  position: relative;
+  border-bottom: 3px solid transparent; 
+  margin-bottom: -2px;
+  transition: all 0.3s ease;
+  
+  /* Thêm khoảng cách và chống co chữ */
+  margin-right: 15px;
+  white-space: nowrap; 
+}
+.tab-button.inactive:hover {
+  color: #718096;
+}
+.tab-button.active {
+  color: #2d3748; /* Màu đậm */
+  border-bottom-color: #007bff;
+}

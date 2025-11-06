@@ -12,10 +12,7 @@ function Header() {
         />
         <span className="header-title">Trình theo dõi Chất lượng Không khí</span>
         
-        <nav className="header-nav">
-          <a href="#map">Bản đồ</a>
-          <a href="#dashboard">Dashboard</a>
-        </nav>
+        
       </div>
 
     </header>

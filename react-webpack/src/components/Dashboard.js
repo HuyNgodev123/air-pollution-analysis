@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 // (Chúng ta sẽ dùng component tìm kiếm "bất đồng bộ")
 import AsyncSelect from 'react-select/async'; 
-
 // Import các component con
 import CurrentStatus from './CurrentStatus';
 import PollutantDetails from './PollutantDetails';
 import HistoryChart from './HistoryChart';
 import AQIMap from './AQIMap';
+import PollutantInfoTabs from './PollutantInfoTabs';
+import './style.css';
 
 // Hàm helper (giữ nguyên)
 const getISODate = (offsetDays = 0) => {
@@ -120,42 +121,52 @@ function Dashboard() {
 
   return (
     <div className="dashboard-container">
-      <h2>Dashboard Phân tích</h2>
+      
+      <div id="dashboard-info"> 
+        <h2>Tìm hiểu về Chất ô nhiễm</h2>
+        <PollutantInfoTabs /> 
+      </div>
 
-      <AQIMap />
 
-      {/* === 5. SỬA LẠI BỘ LỌC (CONTROLS) === */}
-      <div className="controls-grid">
-        <div className="control-item">
-          <label>Tìm & So sánh Địa điểm</label>
+      <div id="map">
+        <h2>Bản đồ Chất lượng không khí</h2>
+        <AQIMap />
+      </div>
+
+      <div id="dashboard">
+        <h2>Dashboard Phân tích</h2>
+        <div className="controls-grid">
+          <div className="control-item">
+            <label>Tìm & So sánh Địa điểm</label>
+            
+            {/* THAY THẾ 'Select' (hoặc <select>) BẰNG 'AsyncSelect' */}
+            <AsyncSelect
+              isMulti // Cho phép chọn nhiều
+              cacheOptions // Lưu kết quả tìm kiếm (ví dụ: "vung tau")
+              loadOptions={loadOptions} // Hàm tìm kiếm (Bước 4)
+              value={selectedCities}
+              onChange={(selectedOptions) => setSelectedCities(selectedOptions || [])}
+              placeholder="Gõ tên tỉnh/trạm (ví dụ: Vũng Tàu...)"
+            />
+          </div>
           
-          {/* THAY THẾ 'Select' (hoặc <select>) BẰNG 'AsyncSelect' */}
-          <AsyncSelect
-            isMulti // Cho phép chọn nhiều
-            cacheOptions // Lưu kết quả tìm kiếm (ví dụ: "vung tau")
-            loadOptions={loadOptions} // Hàm tìm kiếm (Bước 4)
-            value={selectedCities}
-            onChange={(selectedOptions) => setSelectedCities(selectedOptions || [])}
-            placeholder="Gõ tên tỉnh/trạm (ví dụ: Vũng Tàu...)"
-          />
-        </div>
-        
-        {/* Bộ lọc Ngày (Giữ nguyên) */}
-        <div className="control-item">
-          <label>Từ ngày</label>
-          <input 
-            type="date" 
-            value={fromDate}
-            onChange={(e) => setFromDate(e.target.value)}
-          />
-        </div>
-        <div className="control-item">
-          <label>Đến ngày</label>
-          <input 
-            type="date" 
-            value={toDate}
-            onChange={(e) => setToDate(e.target.value)}
-          />
+          {/* Bộ lọc Ngày (Giữ nguyên) */}
+          <div className="control-item">
+            <label>Từ ngày</label>
+            <input 
+              type="date" 
+              value={fromDate}
+              onChange={(e) => setFromDate(e.target.value)}
+            />
+          </div>
+          <div className="control-item">
+            <label>Đến ngày</label>
+            <input 
+              type="date" 
+              value={toDate}
+              onChange={(e) => setToDate(e.target.value)}
+            />
+          </div>
         </div>
       </div>
 
