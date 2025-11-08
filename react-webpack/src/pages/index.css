@@ -1,0 +1,117 @@
+.login-page-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px; 
+  min-height: 60vh; 
+}
+
+.login-container {
+  background-color: #ffffff;
+  padding: 2.5rem;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 450px;
+  text-align: center;
+}
+
+/* ... (Các style .h2, .subtitle, .form-group, .btn... giữ nguyên) ... */
+.login-container h2 {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #212529;
+  margin-bottom: 0.5rem;
+}
+.login-container .subtitle {
+  font-size: 1rem;
+  color: #6c757d;
+  margin-bottom: 2rem;
+}
+.login-container .subtitle a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 500;
+}
+.form-group {
+  text-align: left;
+  margin-bottom: 1.25rem;
+}
+.form-group label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: #495057;
+}
+.form-group input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  box-sizing: border-box; 
+}
+.forgot-password {
+  display: block;
+  text-align: right;
+  font-size: 0.9rem;
+  color: #007bff;
+  text-decoration: none;
+  margin-bottom: 1.5rem;
+}
+.btn {
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+.btn-primary {
+  background-color: #007bff;
+  color: white;
+  margin-bottom: 1.5rem;
+}
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+/* === ĐÂY LÀ KHỐI ĐÃ SỬA (DÙNG DẤU CÁCH THƯỜNG) === */
+.divider {
+  font-size: 0.9rem;
+  color: #6c757d;
+  margin-bottom: 1.5rem;
+}
+/* === KẾT THÚC SỬA === */
+
+
+/* (Style cho .social-login-container giữ nguyên) */
+.social-login-container {
+  display: flex;
+  flex-wrap: wrap; /* Cho phép xuống dòng nếu màn hình quá hẹp */
+  justify-content: center; /* Căn giữa các nút */
+  align-items: center; /* Căn thẳng hàng (dù chiều cao khác nhau) */
+  gap: 10px; /* Khoảng cách giữa các nút */
+}
+
+.social-login-container > div {
+  flex-shrink: 1; /* Cho phép nút Google co lại */
+}
+
+.social-btn {
+  flex: 1; /* Chia đều không gian */
+  min-width: 120px; /* THÊM độ rộng tối thiểu */
+}
+
+.social-btn.facebook {
+  background-color: #1877f2;
+  color: white;
+}
+
+.social-btn.apple {
+  background-color: #000000;
+  color: white;
+}

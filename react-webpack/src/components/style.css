@@ -5,35 +5,69 @@
   padding: 1rem 0;
   border-bottom: 1px solid #e0e0e0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
-.container-header { 
+.container-1{
   width: 90%;
   max-width: 1200px;
-  margin: 20px auto;
-  padding: 20px;
+  margin: 0px auto;
+}
+.header-container {
+  display: flex;
+  justify-content: space-between; /* Căn 2 bên: Logo bên trái, Nav bên phải */
+  align-items: center;
+}
+.logo-container {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  gap: 12px; /* Khoảng cách giữa Logo và Tiêu đề */
+  text-decoration: none; /* Bỏ gạch chân của Link */
+}
+.header-logo {
+  height: 30px; /* Cố định chiều cao logo */
+  width: auto;
 }
 .header-title {
-  font-size: 1.5rem;
+  font-size: 1.25rem; /* Kích thước tiêu đề */
   font-weight: 600;
-  color: #333;
-  margin: inherit;
+  color: #212529; /* Màu chữ đen đậm */
+  border-top: none; 
 }
+
+/* Style cho các link điều hướng */
 .header-nav {
   display: flex;
+  align-items: center; /* Căn giữa theo chiều dọc */
   gap: 20px;
 }
-.header-nav a {
+.header-nav a,
+.header-nav .nav-link { /* Áp dụng cho cả <a> (link neo) và <Link> (router) */
   text-decoration: none;
   color: #555;
   font-weight: 500;
   transition: color 0.2s ease;
+  padding: 5px 0;
 }
-.header-nav a:hover {
+.header-nav a:hover,
+.header-nav .nav-link:hover {
   color: #007bff;
+}
+.nav-link.login-link {
+  color: #007bff;
+  font-weight: 600;
+  border: 1px solid #007bff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  background-color: transparent;
+  transition: all 0.2s ease;
+}
+
+.nav-link.login-link:hover {
+  background-color: #007bff;
+  color: #ffffff;
 }
 
 
@@ -361,7 +395,7 @@
   display: flex;
   /* Cho phép cuộn ngang trên điện thoại nếu không đủ chỗ */
   overflow-x: auto; 
-  justify-content: flex-start; /* Bắt đầu từ bên trái */
+  justify-content: space-between; 
   
   width: 100%;
   margin-top: 2rem;

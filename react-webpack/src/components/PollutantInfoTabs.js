@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import './style.css'; // Import file CSS
+import './style.css';
 
 // 1. "Database" nội dung (giữ nguyên)
 const pollutantData = {
@@ -7,57 +7,57 @@ const pollutantData = {
     id: 'aqi',
     name: 'AQI',
     title: 'Chỉ số chất lượng không khí',
-    description: 'AQI (Chỉ số Chất lượng Không khí) là một hệ thống chuyên đổi các phép đo nồng độ chất ô nhiễm... để hiểu rủi ro sức khỏe do ô nhiễm không khí.',
-    image: 'https://placehold.co/600x400/e2e8f0/94a3b8?text=Ảnh+Người+xem+AQI'
+    description: 'AQI, hay Chỉ số Chất lượng Không khí, là một hệ thống chuyển đổi các phép đo nồng độ chất ô nhiễm đôi khi gây nhầm lẫn hoặc không trực quan thành một thang đo dễ hiểu để thể hiện rõ ràng rủi ro sức khỏe do ô nhiễm không khí môi trường gây ra.',
+    image: 'https://cdn.shopify.com/s/files/1/0677/4059/8571/files/PDP_DesigntoDetect_AQI.jpg?v=1750881604&width=400&crop=center'
   },
   pm1: {
     id: 'pm1',
     name: 'PM1',
     title: 'Hạt siêu nhỏ',
-    description: 'Vật chất hạt (PM) có kích thước nhỏ hơn 1 micron (PM1.0). PM1.0 được coi là đặc biệt nguy hiểm... Các hạt nhỏ như PM1.0 có thể xâm nhập vào màng phổi và vào máu, gây ra các ảnh hưởng sức khỏe toàn thân.',
-    image: 'https://placehold.co/600x400/e2e8f0/94a3b8?text=Ảnh+Khí+thải+Oto'
+    description: 'Vật chất hạt (PM) có kích thước nhỏ hơn 1 micron được gọi là PM1 (đôi khi là PM1.0). PM1 được coi là đặc biệt nguy hiểm do kích thước cực nhỏ của nó. Đường kính hạt càng nhỏ thì thường gây hại càng lớn. Các hạt nhỏ như PM1 đủ nhỏ để xâm nhập vào mô phổi và vào máu. PM1 sau đó có thể lưu thông khắp cơ thể và gây ra các ảnh hưởng sức khỏe toàn thân.',
+    image: 'https://cdn.shopify.com/s/files/1/0677/4059/8571/files/PDP_DesigntoDetect_PM1.jpg?v=1750881604&width=400&crop=center'
   },
   pm25: {
     id: 'pm25',
     name: 'PM2.5',
     title: 'Hạt mịn',
-    description: 'Các hạt PM2.5 có đường kính 2.5 micron hoặc nhỏ hơn. Hạt PM2.5 nhỏ đến mức chỉ có thể nhìn thấy bằng kính hiển vi điện tử... Chúng có thể tồn tại trong không khí trong thời gian dài và được hít sâu vào máu.',
-    image: 'https://placehold.co/600x400/e2e8f0/94a3b8?text=Ảnh+Thành+phố+ô+nhiễm'
+    description: 'Các hạt PM2.5 có đường kính 2,5 micron hoặc nhỏ hơn. Các hạt PM2.5 nhỏ đến mức chỉ có thể nhìn thấy bằng kính hiển vi điện tử. Trong tất cả các chỉ số ô nhiễm không khí, ô nhiễm PM2.5 là mối đe dọa sức khỏe lớn nhất (1). Do kích thước nhỏ, PM2.5 có thể tồn tại trong không khí trong thời gian dài và được hấp thụ sâu vào máu khi hít vào.',
+    image: 'https://cdn.shopify.com/s/files/1/0677/4059/8571/files/PDP_DesigntoDetect_PM2.5.jpg?v=1750881604&width=400&crop=center'
   },
   pm10: {
     id: 'pm10',
     name: 'PM10',
     title: 'Hạt thô',
-    description: 'PM10 là vật chất hạt thô (có thể hít vào) có đường kính 10 micromet (µm) hoặc nhỏ hơn. So sánh, một sợi tóc người có đường kính từ 50 đến 70 µm.',
-    image: 'https://placehold.co/600x400/e2e8f0/94a3b8?text=Ảnh+Khói+nhà+máy'
+    description: 'PM10 là vật chất hạt thô lơ lửng, có thể là rắn hoặc lỏng, với đường kính 10 micromet (µm) hoặc nhỏ hơn. So sánh, một sợi tóc người trung bình có đường kính từ 50 đến 70 µm.',
+    image: 'https://cdn.shopify.com/s/files/1/0677/4059/8571/files/PDP_DesigntoDetect_PM10.jpg?v=1750881604&width=400&crop=center'
   },
   nhietdo: {
     id: 'nhietdo',
     name: 'Nhiệt độ',
     title: 'Nhiệt độ',
-    description: 'Nhiệt độ có vai trò quan trọng trong việc giám sát chất lượng không khí... Nhiệt độ cao có thể làm tăng ô nhiễm, trong khi đó nhiệt độ thấp có thể làm giảm chất lượng không khí.',
-    image: 'https://placehold.co/600x400/e2e8f0/94a3b8?text=Ảnh+Bản+đồ+Nhiệt+độ'
+    description: 'Nhiệt độ rất quan trọng trong việc giám sát chất lượng không khí vì nó ảnh hưởng đến sự hình thành, phân tán chất ô nhiễm và độ chính xác của cảm biến. Nhiệt độ cao có thể làm tăng ô nhiễm, trong khi đảo nhiệt độ giữ chất ô nhiễm lại, làm giảm chất lượng không khí. Việc theo dõi giúp dự báo nguy cơ ô nhiễm và đảm bảo các chỉ số chính xác.',
+    image: 'https://cdn.shopify.com/s/files/1/0677/4059/8571/files/temperature.jpg?v=1750881604&width=400&crop=center'
   },
   doam: {
     id: 'doam',
     name: 'Độ ẩm',
     title: 'Độ ẩm tương đối',
-    description: 'Độ ẩm quan trọng trong việc giám sát chất lượng không khí... Độ ẩm cao có thể làm tăng các vấn đề về hô hấp, thúc đẩy sự phát triển của nấm mốc và thay đổi nồng độ chất ô nhiễm.',
-    image: 'https://placehold.co/600x400/e2e8f0/94a3b8?text=Ảnh+Mưa+trên+cửa+kính'
+    description: 'Độ ẩm quan trọng trong việc giám sát chất lượng không khí vì nó ảnh hưởng đến sức khỏe, hành vi của chất ô nhiễm và độ chính xác của cảm biến. Độ ẩm cao có thể làm trầm trọng thêm các vấn đề về hô hấp, thúc đẩy sự phát triển của nấm mốc và thay đổi mức độ chất ô nhiễm, trong khi độ ẩm thấp làm tăng sự lây lan của virus. Việc theo dõi độ ẩm giúp đảm bảo một môi trường lành mạnh hơn.',
+    image: 'https://cdn.shopify.com/s/files/1/0677/4059/8571/files/humidity.jpg?v=1750881604&width=400&crop=center'
   },
   apsuat: {
     id: 'apsuat',
     name: 'Áp kế',
     title: 'Áp suất khí quyển',
-    description: 'Áp suất khí quyển quan trọng vì nó ảnh hưởng đến sự di chuyển và phân tán của các chất ô nhiễm... Áp suất cao có thể giữ các chất ô nhiễm gần mặt đất.',
-    image: 'https://placehold.co/600x400/e2e8f0/94a3b8?text=Ảnh+Bản+đồ+Áp+suất'
+    description: 'Áp suất khí quyển quan trọng trong việc giám sát chất lượng không khí vì nó ảnh hưởng đến sự di chuyển và phân tán của các chất ô nhiễm trong khí quyển. Hệ thống áp cao có thể gây ra điều kiện không khí tù đọng, giữ các chất ô nhiễm gần mặt đất và dẫn đến chất lượng không khí kém. Ngược lại, hệ thống áp thấp có thể tăng cường lưu thông không khí, phân tán các chất ô nhiễm hiệu quả hơn.',
+    image: 'https://cdn.shopify.com/s/files/1/0677/4059/8571/files/Barometric-pressure.jpg?v=1750881604&width=400&crop=center'
   },
   co2: {
     id: 'co2',
     name: 'CO2*',
     title: 'Mô-đun CO2 tùy chọn',
-    description: 'Ở nhiệt độ phòng, carbon dioxide (CO2) là một loại khí không màu, không mùi... Ở nồng độ cao, CO2 được coi là "bẩn".',
-    image: 'https://placehold.co/600x400/e2e8f0/94a3b8?text=Ảnh+Ống+khói+CO2'
+    description: 'Ở nhiệt độ phòng, carbon dioxide (CO2) là một loại khí không màu, không mùi được tạo thành từ các nguyên tử cacbon và oxy. Là khí phổ biến thứ tư trong khí quyển trái đất, sau nitơ, oxy và argon, CO2 cũng có thể tồn tại ở dạng lỏng hoặc rắn. Ở dạng rắn, CO2 được gọi là băng khô.',
+    image: 'https://cdn.shopify.com/s/files/1/0677/4059/8571/files/PDP_DesigntoDetect_CO2.jpg?v=1750881604&width=400&crop=center'
   }
 };
 
