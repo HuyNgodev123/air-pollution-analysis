@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext'; // Import hook
 import { GoogleLogin } from '@react-oauth/google'; // Import nút Google
-
-// (Giả sử bạn có tệp CSS này)
 import './index.css'; 
 
-const LoginPage = () => {
+const RegisterPage = () => {
   const [formData, setFormData] = useState({
+    name: '',
     email: '',
     password: '',
+    confirmPassword: ''
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -17,7 +17,7 @@ const LoginPage = () => {
   const { login } = useAuth(); // Lấy hàm login từ context
   const navigate = useNavigate();
   
-  const { email, password } = formData;
+  const { name, email, password, confirmPassword } = formData;
 
   const handleChange = (e) => {
     setFormData({
@@ -27,31 +27,33 @@ const LoginPage = () => {
   };
 
   /**
-   * @desc XỬ LÝ ĐĂNG NHẬP EMAIL/PASSWORD (Giữ nguyên)
+   * @desc XỬ LÝ ĐĂNG KÝ EMAIL/PASSWORD
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    setLoading(true);
-
-    if (!email || !password) {
-      setError('Vui lòng nhập email và mật khẩu.');
-      setLoading(false);
+    
+    // Kiểm tra mật khẩu
+    if (password !== confirmPassword) {
+      setError('Mật khẩu nhập lại không khớp.');
       return;
     }
+    
+    setLoading(true);
 
     try {
-      const res = await fetch('/api/auth/login', {
+      const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ name, email, password }),
       });
 
       const data = await res.json();
       setLoading(false);
 
-      if (!res.ok) throw data;
+      if (!res.ok) throw data; // Server trả về lỗi (ví dụ: email đã tồn tại)
 
+      // Đăng ký thành công, tự động đăng nhập
       login(data.token); // Lưu token vào context
       navigate('/dashboard'); // Chuyển hướng
 
@@ -59,73 +61,71 @@ const LoginPage = () => {
       setLoading(false);
       console.error(err);
       if (err.errors && err.errors[0]) {
-        setError(err.errors[0].msg);
+        setError(err.errors[0].msg); // Hiển thị lỗi từ server
       } else {
-        setError('Đăng nhập thất bại. Vui lòng thử lại.');
+        setError('Đăng ký thất bại. Vui lòng thử lại.');
       }
     }
   };
 
   /**
-   * @desc XỬ LÝ KHI GOOGLE TRẢ VỀ (Cập nhật)
+   * @desc XỬ LÝ KHI GOOGLE TRẢ VỀ (Giống hệt LoginPage)
    */
   const handleGoogleSuccess = async (credentialResponse) => {
-    console.log("Đăng nhập Google thành công, đang gửi về backend...", credentialResponse);
     setError('');
-    setLoading(true); // Hiển thị loading khi đang xác thực backend
-
+    setLoading(true);
     try {
       const googleToken = credentialResponse.credential;
-
-      // Gửi token này về Backend
       const res = await fetch('/api/auth/google', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token: googleToken }),
       });
-
       const data = await res.json();
       setLoading(false);
-
       if (!res.ok) throw data;
-
-      // Đã nhận token của app, LƯU VÀO CONTEXT
       login(data.token);
-
-      console.log("Đã nhận token của app, đang chuyển về trang dashboard...");
-      navigate('/dashboard'); // Chuyển hướng
-
+      navigate('/dashboard');
     } catch (err) {
       setLoading(false);
-      console.error('Lỗi khi gửi token về backend:', err);
-      setError(err.error || 'Xác thực Google thất bại. Vui lòng thử lại.');
+      setError(err.error || 'Xác thực Google thất bại.');
     }
   };
 
   const handleGoogleError = () => {
-    console.error('Đăng nhập Google thất bại');
-    setError('Đăng nhập Google thất bại. Vui lòng thử lại.');
+    setError('Đăng nhập Google thất bại.');
   };
 
-  // Sử dụng cấu trúc JSX (Đã xóa style inline)
   return (
     <div className="login-page-wrapper">
       <div className="login-container">
-        <h2>Chào mừng trở lại</h2>
+        <h2>Tạo tài khoản</h2>
         <p className="subtitle">
-          Chưa có tài khoản? <Link to="/register">Tạo tài khoản</Link>
+          Đã có tài khoản? <Link to="/login">Đăng nhập</Link>
         </p>
 
         {/* Form email */}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
+            <label htmlFor="name">Tên hiển thị</label>
+            <input 
+              type="text" 
+              id="name" 
+              name="name"
+              value={name} 
+              onChange={handleChange}
+              placeholder="Tên của bạn" 
+              required 
+            />
+          </div>
+          <div className="form-group">
             <label htmlFor="email">Email</label>
             <input 
               type="email" 
               id="email" 
-              name="email" // Thêm name
+              name="email"
               value={email} 
-              onChange={handleChange} // Sử dụng handleChange
+              onChange={handleChange}
               placeholder="Email" 
               required 
             />
@@ -135,33 +135,40 @@ const LoginPage = () => {
             <input 
               type="password" 
               id="password" 
-              name="password" // Thêm name
+              name="password"
               value={password} 
-              onChange={handleChange} // Sử dụng handleChange
+              onChange={handleChange}
               placeholder="Nhập mật khẩu" 
+              required 
+              minLength="6"
+            />
+          </div>
+           <div className="form-group">
+            <label htmlFor="confirmPassword">Xác nhận Mật khẩu</label>
+            <input 
+              type="password" 
+              id="confirmPassword" 
+              name="confirmPassword"
+              value={confirmPassword} 
+              onChange={handleChange}
+              placeholder="Nhập lại mật khẩu" 
               required 
             />
           </div>
           
-          <Link to="/forgot-password" className="forgot-password">
-            Quên mật khẩu?
-          </Link>
-          
-          {/* Giữ lại style inline cho thông báo lỗi */}
           {error && <p style={{ color: 'red', marginBottom: '1rem' }}>{error}</p>}
 
           <button 
             type="submit" 
             className="btn btn-primary" 
             disabled={loading}
-            // style đã bị xóa
           >
-            {loading ? 'Đang xử lý...' : 'Đăng nhập bằng email'}
+            {loading ? 'Đang xử lý...' : 'Tạo tài khoản'}
           </button>
         </form>
 
         <div className="divider" style={{ textAlign: 'center' }}>
-          Hoặc đăng nhập với
+          Hoặc đăng ký với
         </div>
 
         {/* Nút Google "thật" */}
@@ -171,21 +178,12 @@ const LoginPage = () => {
             onError={handleGoogleError}
             theme="outline"
             size="large"
+            width="100%"
           />
-        </div>
-        
-        {/* Các nút (giả) còn lại nếu bạn muốn */}
-        <div style={{ display: 'flex', gap: '10px', marginTop: '1rem' }}>
-          <button type="button" className="btn social-btn facebook">
-            Facebook
-          </button>
-          <button type="button" className="btn social-btn apple">
-            Apple
-          </button>
         </div>
       </div>
     </div>
   );
 };
 
-export default LoginPage;
+export default RegisterPage;

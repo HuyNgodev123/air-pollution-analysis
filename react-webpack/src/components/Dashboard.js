@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 // (Chúng ta sẽ dùng component tìm kiếm "bất đồng bộ")
 import AsyncSelect from 'react-select/async'; 
+import ReactPlayer from 'react-player';
 // Import các component con
 import CurrentStatus from './CurrentStatus';
 import PollutantDetails from './PollutantDetails';
 import HistoryChart from './HistoryChart';
 import AQIMap from './AQIMap';
 import PollutantInfoTabs from './PollutantInfoTabs';
+import VideoSection from './VideoSection';
 import './style.css';
 
 // Hàm helper (giữ nguyên)
@@ -121,7 +123,22 @@ function Dashboard() {
 
   return (
     <div className="dashboard-container">
-      
+
+      <VideoSection />
+
+      <div className='machine'>
+        <div className='mechine-info-1'> 
+          <h2>Các máy đo chất lượng không khí AirVisual được thiết kế để phát hiện các chất ô nhiễm này</h2>
+        </div>
+        <div className='mechine-info-2'>
+          <p> <b>AirVisual Pro</b> có thể theo dõi tới 5 thông số môi trường; AQI,
+             PM2.5, CO2, Nhiệt độ và Độ ẩm.
+            Trong khi <b>AirVisual Outdoor</b> có thể theo dõi tới 8 thông số môi trường; 
+            AQI, PM1, PM2.5, PM10, Nhiệt độ, Độ ẩm, Áp suất khí quyển và tùy chọn CO2.</p>
+        </div>
+        
+      </div>
+
       <div id="dashboard-info"> 
         <h2>Tìm hiểu về Chất ô nhiễm</h2>
         <PollutantInfoTabs /> 
@@ -134,7 +151,7 @@ function Dashboard() {
       </div>
 
       <div id="dashboard">
-        <h2>Dashboard Phân tích</h2>
+        <h2 className="dashboard-desc">Dashboard Phân tích</h2>
         <div className="controls-grid">
           <div className="control-item">
             <label>Tìm & So sánh Địa điểm</label>

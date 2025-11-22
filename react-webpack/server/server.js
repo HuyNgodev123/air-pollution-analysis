@@ -5,6 +5,7 @@ import connectDB from './config/db.js';
 import startPoller from './jobs/poller.js';
 import measurementsRouter from './routes/measurements.js';
 import locationsRouter from './routes/locations.js'; 
+import authRouter from './routes/auth.js'; 
 import { seedLocations } from './seed.js';
 
 
@@ -15,6 +16,8 @@ app.use(express.json());
 
 app.use('/api/measurements', measurementsRouter);
 app.use('/api/locations', locationsRouter);
+
+app.use('/api/auth', authRouter);
 app.get('/', (req, res) => res.send('Air Quality API running...'));
 
 

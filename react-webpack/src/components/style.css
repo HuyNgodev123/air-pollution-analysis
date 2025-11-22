@@ -69,7 +69,174 @@
   background-color: #007bff;
   color: #ffffff;
 }
+/* neu dã dang nhap */
+.nav-link.user-greeting {
+  display: flex;
+  align-items: center;
+  color: #333; /* Màu chữ cho lời chào */
+  font-weight: 500;
+  cursor: default; /* Không phải link nên không cần con trỏ */
+}
 
+/* Nút đăng xuất (giả mạo .nav-link để đồng bộ) */
+.nav-link.btn-logout {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem; /* Giống .nav-link */
+  font-family: inherit; /* Giống .nav-link */
+  color: #007bff; /* (Tùy chọn) Làm cho nó giống link */
+  padding: 0;
+  margin-left: 10px;
+}
+
+.nav-link.btn-logout:hover {
+  text-decoration: underline;
+  color: #0056b3;
+}
+
+/* --- 1. Style cho Nút icon Giỏ hàng trên menu --- */
+.cart-icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #333;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  transition: color 0.3s;
+}
+
+.cart-icon-btn:hover {
+  color: #007bff; /* Đổi màu xanh khi di chuột */
+}
+
+/* --- 2. Lớp phủ mờ (Overlay) che toàn màn hình --- */
+.cart-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5); /* Màu đen mờ 50% */
+  z-index: 2000; /* Cao hơn header để che phủ tất cả */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+/* Khi có class .open thì hiện lên */
+.cart-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* --- 3. Khung Giỏ hàng (Drawer) trượt từ phải sang --- */
+.cart-drawer {
+  position: fixed;
+  top: 0;
+  right: -100%; /* Mặc định ẩn hẳn sang bên phải màn hình */
+  width: 100%;
+  max-width: 450px; /* Chiều rộng tối đa giống ảnh mẫu */
+  height: 100vh;
+  background-color: white;
+  z-index: 2001; /* Nằm trên lớp phủ overlay */
+  box-shadow: -5px 0 15px rgba(0,0,0,0.1); /* Đổ bóng nhẹ bên trái */
+  display: flex;
+  flex-direction: column;
+  
+  /* Hiệu ứng trượt mượt mà (Ease out) */
+  transition: right 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); 
+}
+
+/* Khi có class .open thì trượt vào vị trí 0 */
+.cart-drawer.open {
+  right: 0;
+}
+
+/* --- 4. Nội dung bên trong Giỏ hàng --- */
+.cart-drawer-header {
+  padding: 20px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.cart-drawer-header h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+/* Nút đóng (X) tròn */
+.close-cart-btn {
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #666;
+  transition: all 0.2s;
+}
+
+.close-cart-btn:hover {
+  background: #f5f5f5;
+  color: #000;
+  border-color: #ccc;
+}
+
+.cart-drawer-body {
+  flex: 1;
+  padding: 40px 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Căn giữa nội dung theo chiều dọc */
+}
+
+/* --- 5. Giao diện khi Giỏ hàng trống --- */
+.empty-cart-content {
+  text-align: center;
+}
+
+.empty-cart-content h3 {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 15px;
+  color: #1a1a1a;
+  line-height: 1.2;
+}
+
+.empty-cart-content p {
+  color: #666;
+  margin-bottom: 30px;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* Hộp gợi ý (Suggestion Box) có mũi tên */
+.suggestion-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #f9fafb;
+  padding: 15px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #1a1a1a;
+  font-weight: 500;
+  transition: background 0.2s;
+  border: 1px solid #eee;
+}
+
+.suggestion-box:hover {
+  background-color: #f3f4f6;
+}
 
 /* Footer.js */
 .app-footer {
@@ -425,4 +592,128 @@
 .tab-button.active {
   color: #2d3748; /* Màu đậm */
   border-bottom-color: #007bff;
+}
+
+/* Dashboard.js */
+.dashboard-desc {
+  margin: 60px 0 20px 0;
+}
+.machine{
+  text-align: center;
+  margin-bottom: 70px;
+}
+.mechine-info-1{
+  font-size: 20px;
+  font-weight: 800;
+  padding: 10px 0 15px 0;
+  color: #222;
+}
+.mechine-info-2{
+  width: 60%;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 14px;
+  color: #555;
+}
+
+
+/* VideoSection.js */
+.video-section {
+  display: flex;
+  flex-wrap: wrap; /* Xuống dòng trên màn hình nhỏ */
+  align-items: center;
+  background-color: #f8f9fa; /* (Tùy chọn) Màu nền nhạt */
+  padding: 40px 20px;
+  border-radius: 12px;
+  margin-bottom: 60px; /* <-- Đây là 60px bạn yêu cầu */
+}
+
+.video-column {
+  flex: 1; /* Chiếm 1 nửa */
+  min-width: 320px; /* Độ rộng tối thiểu */
+  padding-right: 2rem; /* Khoảng cách với cột chữ */
+}
+
+.text-column {
+  flex: 1; /* Chiếm 1 nửa */
+  min-width: 320px; /* Độ rộng tối thiểu */
+  padding-left: 2rem; /* Khoảng cách với cột video */
+}
+
+.text-column h2 {
+  font-size: 2.5rem; /* (Tùy chỉnh) */
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.text-column p {
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+/* CSS cho Video Player (Cập nhật theo code bạn gửi) */
+.player-wrapper {
+ position: relative;
+ width: 100%;
+ padding-bottom: 56.25%; /* Tỷ lệ 16:9 */
+ height: 0;
+ box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+ background-color: #000;
+ overflow: hidden;
+ border-radius: 12px;
+}
+
+/* Selector này yêu cầu thẻ <video> phải có class="react-player" */
+video.react-player {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* === CSS MỚI CHO LÁ CỜ (TRONG DASHBOARD/VIDEOSECTION) === */
+.flags-container {
+  display: flex;
+  align-items: center;
+  gap: 24px; /* Khoảng cách giữa 2 mục cờ */
+}
+
+.flag-item {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Khoảng cách giữa cờ và chữ */
+  font-size: 1rem;
+}
+
+.flag-icon {
+  width: 30px; /* Kích thước cờ */
+  height: auto;
+  border-radius: 4px; /* Bo góc cờ một chút */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* =========================================
+   RESPONSIVE (DI ĐỘNG)
+   ========================================= */
+@media (max-width: 768px) {
+  .video-section {
+    flex-direction: column; /* Xếp chồng dọc */
+    padding: 20px;
+  }
+  
+  .text-column {
+    padding-left: 0;
+    padding-top: 30px; /* Khoảng cách khi xuống dòng */
+  }
+  
+  /* Trên mobile, nút play có thể nhỏ lại chút cho cân đối */
+  .custom-play-button {
+    width: 50px;
+    height: 50px;
+    top: 15px;
+    right: 15px;
+  }
 }

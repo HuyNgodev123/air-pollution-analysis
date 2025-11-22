@@ -3,10 +3,14 @@ import ReactDOM from 'react-dom/client' // nạp thư viện react-dom
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
+import { AuthProvider } from './context/AuthContext';
+import RegisterPage from './pages/RegisterPage';
+
 import Dashboard from './components/Dashboard'
 import Header from './components/Header';
 import Footer from './components/Footer';
 import LoginPage from './pages/LoginPage';
+import ProductsPage from './pages/ProductsPage';
 
 import './components/style.css'
 import './index.css'
@@ -18,22 +22,24 @@ const GOOGLE_CLIENT_ID = "796762141741-5umal96mbuje2thdc90cd2innuoludlb.apps.goo
 // Tạo component App
 function App() {
     return (
-        <React.StrictMode>
+        <>
             <Header />
             <div className="container">
                 {/* Routes sẽ render component tương ứng với URL */}
                 <Routes>
-                {/* Trang chủ (path="/") sẽ render Dashboard */}
-                <Route path="/" element={<Dashboard />} /> 
+                    {/* Trang chủ (path="/") sẽ render Dashboard */}
+                    <Route path="/" element={<Dashboard />} /> 
           
-                {/* Trang (path="/login") sẽ render LoginPage */}
-                <Route path="/login" element={<LoginPage />} />
-          
+                    {/* Trang (path="/login") sẽ render LoginPage */}
+                    <Route path="/login" element={<LoginPage />} />
+
+                    {/* --- 2. THÊM ROUTE CHO SẢN PHẨM Ở ĐÂY --- */}
+                    <Route path="/products" element={<ProductsPage />} />
                 {/* (Bạn có thể thêm Route cho /register ở đây sau) */}
                 </Routes>
             </div>
             <Footer />
-        </React.StrictMode>
+        </>
     )
 }
 
@@ -44,11 +50,16 @@ function App() {
 //React 18 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-        <BrowserRouter>
-        <App />
-        </BrowserRouter>
-    </GoogleOAuthProvider>
+    <React.StrictMode>
+       <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+            <BrowserRouter>
+                <AuthProvider>
+                    <App />
+                </AuthProvider>
+            </BrowserRouter>
+        </GoogleOAuthProvider> 
+    </React.StrictMode>
+    
 );
 
 
