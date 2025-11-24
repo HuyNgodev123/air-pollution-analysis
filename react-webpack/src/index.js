@@ -5,6 +5,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 
 import { AuthProvider } from './context/AuthContext';
 import RegisterPage from './pages/RegisterPage';
+import { CartProvider } from './context/CartContext';
 
 import Dashboard from './components/Dashboard'
 import Header from './components/Header';
@@ -54,7 +55,9 @@ root.render(
        <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
             <BrowserRouter>
                 <AuthProvider>
-                    <App />
+                    <CartProvider>
+                       <App /> 
+                    </CartProvider>
                 </AuthProvider>
             </BrowserRouter>
         </GoogleOAuthProvider> 
