@@ -3,6 +3,7 @@ import axios from 'axios';
 // (Chúng ta sẽ dùng component tìm kiếm "bất đồng bộ")
 import AsyncSelect from 'react-select/async'; 
 import ReactPlayer from 'react-player';
+import { searchCity, fetchAirQuality } from '../services/airQualityService';
 // Import các component con
 import CurrentStatus from './CurrentStatus';
 import PollutantDetails from './PollutantDetails';
@@ -23,7 +24,7 @@ function Dashboard() {
   // === 2. SỬA LẠI STATE ===
   // Bỏ state 'locations', vì 'AsyncSelect' sẽ tự tải
   const [selectedCities, setSelectedCities] = useState([]); // Giữ nguyên
-  const [fromDate, setFromDate] = useState(getISODate(-7)); 
+  const [fromDate, setFromDate] = useState(getISODate(-3)); 
   const [toDate, setToDate] = useState(getISODate(1));   
   const [data, setData] = useState({});
   const [loading, setLoading] = useState(false); // Đặt mặc định là 'false'
@@ -37,34 +38,38 @@ function Dashboard() {
   // === useEffect (fetchData) (Giữ nguyên) ===
   // (Effect này vẫn hoạt động hoàn hảo)
   useEffect(() => {
-    if (selectedCities.length === 0 || !fromDate || !toDate) {
-      setLoading(false);
+    if (selectedCities.length === 0) {
       setData({}); 
       return;
     }
+
     const fetchData = async () => {
       setLoading(true);
       setError(null);
       try {
-        const promises = selectedCities.map(city =>
-          axios.get('/api/measurements', {
-            params: { city: city.value, from: fromDate, to: toDate }
-          })
-        );
-        const responses = await Promise.all(promises);
         const newData = {};
-        responses.forEach((res, index) => {
-          const cityId = selectedCities[index].value;
-          newData[cityId] = res.data.results;
+        
+        // Duyệt qua danh sách thành phố đã chọn
+        const promises = selectedCities.map(async (city) => {
+          // Gọi service, truyền vào tọa độ Lat/Lon từ city
+          const result = await fetchAirQuality(city.lat, city.lon, fromDate, toDate);
+          
+          if (result) {
+            newData[city.value] = result; // Lưu kết quả
+          }
         });
+
+        await Promise.all(promises);
         setData(newData);
+
       } catch (err) {
-        console.error("Lỗi khi gọi API đo lường:", err);
-        setError(err.message);
+        console.error("Lỗi dashboard:", err);
+        setError("Không thể tải dữ liệu.");
       } finally {
         setLoading(false);
       }
     };
+
     fetchData();
   }, [selectedCities, fromDate, toDate]); 
 
@@ -74,17 +79,8 @@ function Dashboard() {
    * @param {string} inputValue Từ khóa người dùng gõ (ví dụ: "vung")
    */
   const loadOptions = async (inputValue) => {
-    // Chỉ tìm khi người dùng gõ 2+ ký tự
-    if (inputValue.length < 2) return []; 
-    
-    try {
-      // Gọi API search mới mà chúng ta đã tạo
-      const res = await axios.get(`/api/locations/search?q=${inputValue}`);
-      return res.data; // API đã trả về format { value: '...', label: '...' }
-    } catch (err) {
-      console.error("Lỗi tìm kiếm địa điểm:", err);
-      return []; // Trả về mảng rỗng nếu lỗi
-    }
+    // Gọi hàm tìm kiếm từ service
+    return await searchCity(inputValue);
   };
   
   // === renderContent() (Giữ nguyên) ===

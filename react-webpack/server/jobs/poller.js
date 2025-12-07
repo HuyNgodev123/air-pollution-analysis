@@ -13,7 +13,6 @@ async function fetchAllSourcesForCity(city) {
 }
 
 // === BẮT ĐẦU SỬA LỖI: Quay lại vòng lặp tuần tự ===
-// (Gỡ bỏ Promise.allSettled)
 async function pollOnce() {
   let citiesToPoll = [];
   try {
@@ -39,9 +38,8 @@ async function pollOnce() {
     console.error('Poller error during fetch:', err.message);
   }
 }
-// === KẾT THÚC SỬA LỖI ===
 
-export default function startPoller(cronExpr = '*/30 * * * *') { 
+export default function startPoller(cronExpr = '0 */1 * * *') { 
   // (Phần còn lại của file giữ nguyên)
   pollOnce().catch(e => console.error('Initial poll error', e.message || e));
   

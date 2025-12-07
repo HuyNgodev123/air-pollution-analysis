@@ -334,58 +334,57 @@
 
 /* PollutantDetails.css */
 .details-container {
-  background-color: #ffffff;
-  border-radius: 8px;
+  background: white;
+  border-radius: 12px;
   padding: 20px;
-  margin-top: 25px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-top: 20px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-.details-container h3 {
-  text-align: center;
-  margin-bottom: 20px;
-  color: #333;
+.details-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 15px;
+  border-bottom: 2px solid #f3f4f6;
+  padding-bottom: 10px;
 }
 
 .details-grid {
   display: grid;
-  /* * Tạo các cột tự động:
-   * - Tối thiểu 120px
-   * - Tối đa 1fr (chia đều không gian còn lại)
-   * - Nó sẽ tự động ngắt dòng trên điện thoại
-   */
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 16px; /* Khoảng cách giữa các ô */
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 15px;
 }
 
 .detail-item {
-  background-color: #f8f9fa;
-  border-radius: 6px;
+  background-color: #f9fafb;
+  border-radius: 8px;
   padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
-  border: 1px solid #e9ecef;
+  border: 1px solid #f3f4f6;
 }
 
 .detail-name {
-  display: block;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: #555;
+  font-size: 13px;
+  color: #6b7280;
   margin-bottom: 5px;
+  font-weight: 500;
 }
 
 .detail-value {
-  display: block;
-  font-size: 1.25rem;
+  font-size: 20px;
   font-weight: 700;
-  color: #111;
+  color: #2563eb;
 }
 
 .detail-unit {
-  font-size: 0.8rem;
-  font-weight: 400;
-  color: #666;
-  margin-left: 4px;
+  font-size: 12px;
+  color: #9ca3af;
+  margin-left: 2px;
 }
 
 /* HistoryChart.css */
@@ -439,25 +438,84 @@
 
 
 /* AQIMap.css */
-.map-container {
-  margin-top: 25px;
-  background-color: #ffffff;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-.map-container h3 {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-/* Quan trọng: Đặt chiều cao cho Leaflet container */
-.leaflet-container {
+/* Container bao ngoài bản đồ */
+.aqi-map-wrapper {
   height: 450px;
   width: 100%;
-  border-radius: 8px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb; /* Viền xám nhẹ */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ */
+  position: relative;
+  z-index: 1; /* Đảm bảo nằm dưới các overlay khác nếu có */
 }
+
+/* Class bắt buộc của Leaflet để hiển thị full chiều cao */
+.leaflet-map {
+  height: 100%;
+  width: 100%;
+}
+
+/* --- Tùy chỉnh Popup --- */
+.aqi-popup .leaflet-popup-content-wrapper {
+  border-radius: 12px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  padding: 0;
+  overflow: hidden;
+}
+
+.aqi-popup .leaflet-popup-content {
+  margin: 0;
+  width: 200px !important; /* Cố định chiều rộng popup */
+}
+
+.popup-content {
+  padding: 16px;
+  text-align: center;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.popup-title {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+/* Vòng tròn AQI */
+.aqi-circle {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  margin: 0 auto 10px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  border: 2px solid white;
+}
+
+.aqi-number {
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.aqi-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.aqi-status {
+  margin: 0 0 12px 0;
+  font-weight: 700;
+  font-size: 14px;
+}
+
 
 
 

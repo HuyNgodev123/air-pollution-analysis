@@ -1,60 +1,51 @@
 import React from 'react';
-import './style.css'; 
+import './style.css'; // Hoặc file css riêng của bạn
 
-// Danh sách các chất ô nhiễm chính chúng ta muốn hiển thị
-// Tên (key) phải khớp với 'parameter' đã chuẩn hóa trong service
+// Danh sách các chất ô nhiễm cần hiển thị
+// 'key' phải khớp với tên thuộc tính trả về từ airQualityService.js
 const POLLUTANT_PARAMS = [
-  { key: 'pm25', name: 'PM2.5' },
-  { key: 'pm10', name: 'PM10' },
-  { key: 'o3', name: 'Ozone (O₃)' },
-  { key: 'no2', name: 'NO₂' },
-  { key: 'so2', name: 'SO₂' },
-  { key: 'co', name: 'CO' },
-  { key: 't', name: 'Nhiệt độ' },
+  { key: 'pm25', name: 'PM2.5', unit: 'µg/m³' },
+  { key: 'pm10', name: 'PM10', unit: 'µg/m³' },
+  { key: 'o3', name: 'Ozone (O₃)', unit: 'µg/m³' },
+  { key: 'no2', name: 'NO₂', unit: 'µg/m³' },
+  { key: 'so2', name: 'SO₂', unit: 'µg/m³' },
+  { key: 'co', name: 'CO', unit: 'µg/m³' },
+  { key: 'uv', name: 'Tia cực tím (UV)', unit: '' },
 ];
 
-/**
- * Component này nhận toàn bộ mảng 'data'
- * và trích xuất giá trị mới nhất cho từng chất ô nhiễm
- */
 function PollutantDetails({ data }) {
-  
-  // Tạo một đối tượng (Map) để lưu giá trị mới nhất của từng chất
-  // Vì 'data' đã được sắp xếp mới nhất -> cũ nhất,
-  // chúng ta chỉ cần tìm bản ghi đầu tiên khớp với 'parameter'
-  const latestDetails = new Map();
+  // Nếu không có data hoặc data rỗng thì không hiện gì cả
+  if (!data) return null;
 
-  for (const param of POLLUTANT_PARAMS) {
-    const item = data.find(d => d.parameter === param.key);
-    if (item) {
-      latestDetails.set(param.key, {
-        ...param,
-        value: item.value,
-        unit: item.unit || '',
-      });
-    }
-  }
-
-  // Chuyển Map thành mảng để render
-  const detailsList = Array.from(latestDetails.values());
-
-  if (detailsList.length === 0) {
-    return null; // Không hiển thị gì nếu không có dữ liệu chi tiết
-  }
+  // --- HÀM FORMAT GIÁ TRỊ (để hiển thị đẹp hơn nếu cần, ví dụ làm tròn) ---
+  // Lưu ý: Đây không phải formatPrice (tiền tệ) mà là format chỉ số ô nhiễm
+  const formatValue = (val) => {
+    if (val === null || val === undefined) return '-';
+    return val; 
+  };
 
   return (
     <div className="details-container">
-      <h3>Chi tiết các chỉ số</h3>
+      <h3 className="details-title">Chi tiết các chỉ số đo lường</h3>
+      
       <div className="details-grid">
-        {detailsList.map(item => (
-          <div key={item.key} className="detail-item">
-            <span className="detail-name">{item.name}</span>
-            <span className="detail-value">
-              {item.value} 
-              <span className="detail-unit">{item.unit}</span>
-            </span>
-          </div>
-        ))}
+        {POLLUTANT_PARAMS.map((param) => {
+          // Lấy giá trị trực tiếp từ object data (VD: data.pm25)
+          const value = data[param.key];
+
+          // Chỉ hiển thị những chất có số liệu (khác null/undefined)
+          if (value === undefined || value === null) return null;
+
+          return (
+            <div key={param.key} className="detail-item">
+              <span className="detail-name">{param.name}</span>
+              <div className="detail-value-group">
+                <span className="detail-value">{formatValue(value)}</span>
+                <span className="detail-unit">{param.unit}</span>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
