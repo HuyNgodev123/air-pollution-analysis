@@ -8,6 +8,7 @@ import locationsRouter from './routes/locations.js';
 import authRouter from './routes/auth.js'; 
 import { seedLocations } from './seed.js';
 import productRoutes from './routes/products.js';
+import user from './routes/user.js';
 
 
 const app = express();
@@ -19,6 +20,7 @@ app.use('/api/measurements', measurementsRouter);
 app.use('/api/locations', locationsRouter);
 app.use('/api/products', productRoutes);
 app.use('/api/auth', authRouter);
+app.use('/api/user', user);
 app.get('/', (req, res) => res.send('Air Quality API running...'));
 
 

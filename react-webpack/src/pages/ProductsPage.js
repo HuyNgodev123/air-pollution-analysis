@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart, Filter, Database, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'; // Import icon mũi tên
+import { ShoppingCart, Filter, Database, Trash2, ChevronLeft, ChevronRight, CreditCard } from 'lucide-react'; // Import icon mũi tên
 import { useCart } from '../context/CartContext'; // <--- 1. IMPORT CONTEXT GIỎ HÀNG
+import { useNavigate } from 'react-router-dom';
 import './index.css'; 
 
 // --- DỮ LIỆU MẪU ---
@@ -78,6 +79,7 @@ const ProductsPage = () => {
   // --- 3. LẤY HÀM addToCart TỪ CONTEXT ---
   const { addToCart } = useCart(); 
 
+  const navigate = useNavigate();
   const fetchProducts = async () => {
     setLoading(true);
     try {
@@ -127,6 +129,12 @@ const ProductsPage = () => {
   const formatPrice = (p) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p);
   const handleImageError = (e) => { e.target.src = "https://placehold.co/600x400/e2e8f0/64748b?text=No+Image"; };
 
+  // --- 3. HÀM XỬ LÝ MUA NGAY ---
+  const handleBuyNow = (product) => {
+    // Chuyển hướng sang trang /checkout
+    // state: { product } giúp truyền dữ liệu sản phẩm sang trang mới mà không cần lưu vào localStorage
+    navigate('/checkout', { state: { product } });
+  };
   // --- 4. LOGIC TÍNH TOÁN PHÂN TRANG ---
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -175,12 +183,12 @@ const ProductsPage = () => {
           <div className="products-grid">
             {currentProducts.map((product) => (
               <div key={product._id} className="product-card">
-                <div className="product-image-wrapper">
+                <div className="product-image-wrapper" onClick={() => handleBuyNow(product)} style={{cursor: 'pointer'}}>
                   <img src={product.image} alt={product.name} onError={handleImageError} />
                   <span className="product-badge">{product.category}</span>
                 </div>
                 <div className="product-info">
-                  <h3 className="product-name" title={product.name}>{product.name}</h3>
+                  <h3 className="product-name" onClick={() => handleBuyNow(product)} style={{cursor: 'pointer'}} title={product.name}>{product.name}</h3>
                   <p className="product-desc">{product.description}</p>
                   <div className="product-footer">
                     <span className="product-price">{formatPrice(product.price)}</span>
@@ -191,6 +199,14 @@ const ProductsPage = () => {
                       title="Thêm vào giỏ"
                     >
                       <ShoppingCart size={18} />
+                    </button>
+                    <button 
+                        className="btn-add-cart" 
+                        onClick={() => handleBuyNow(product)} 
+                        title="Mua ngay"
+                        style={{width: 'auto', padding: '0 15px', borderRadius: '20px', fontSize: '13px', fontWeight: 'bold', gap: '5px'}}
+                    >
+                        Mua ngay <CreditCard size={16} />
                     </button>
                   </div>
                 </div>

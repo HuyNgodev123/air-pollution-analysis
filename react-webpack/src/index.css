@@ -32,7 +32,7 @@ h1, h2, h3, h4, h5, h6 {
 /*5 Grid cho các bộ lọc */
 .controls-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr; /* Cột 1 rộng, 2 cột sau hẹp */
+  grid-template-columns: 2fr auto 1fr 1fr; /* Cột 1 rộng, 2 cột sau hẹp */
   gap: 20px;
   align-items: flex-end;
   margin-top: 25px;

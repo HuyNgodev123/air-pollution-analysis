@@ -4,14 +4,17 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
 import { AuthProvider } from './context/AuthContext';
-import RegisterPage from './pages/RegisterPage';
 import { CartProvider } from './context/CartContext';
 
 import Dashboard from './components/Dashboard'
 import Header from './components/Header';
 import Footer from './components/Footer';
 import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
 import ProductsPage from './pages/ProductsPage';
+import CheckoutPage from './pages/CheckoutPage';
+import UserProfilePage from './pages/UserProfilePage';
+import AdminUserPage  from './pages/AdminUserPage';
 
 import './components/style.css'
 import './index.css'
@@ -34,9 +37,18 @@ function App() {
                     {/* Trang (path="/login") sẽ render LoginPage */}
                     <Route path="/login" element={<LoginPage />} />
 
+                    {/* Trang (path="/register") sẽ render RegisterPage */}
+                    <Route path="/register" element={<RegisterPage />} />
+
                     {/* --- 2. THÊM ROUTE CHO SẢN PHẨM Ở ĐÂY --- */}
                     <Route path="/products" element={<ProductsPage />} />
-                {/* (Bạn có thể thêm Route cho /register ở đây sau) */}
+
+                    {/* --- 3. THÊM ROUTE CHO CHECKOUT Ở ĐÂY --- */}
+                    <Route path="/checkout" element={<CheckoutPage />} />
+
+                    <Route path="/profile" element={<UserProfilePage />} />
+
+                    <Route path="/admin" element={<AdminUserPage />} />
                 </Routes>
             </div>
             <Footer />

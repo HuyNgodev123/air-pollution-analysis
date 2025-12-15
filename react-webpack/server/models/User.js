@@ -27,6 +27,21 @@ const UserSchema = new mongoose.Schema({
   picture: {
     type: String,
   },
+  role: {
+    type: String,
+    default: 'user', // Mặc định ai đăng ký cũng là 'user'
+    enum: ['user', 'admin'] // Chỉ chấp nhận 2 giá trị này
+  },
+  searchHistory: [{
+    cityLabel: String, // Tên hiển thị (VD: Hanoi, Vietnam)
+    value: String,     // ID định danh
+    lat: Number,
+    lon: Number,
+    searchedAt: { 
+      type: Date, 
+      default: Date.now 
+    }
+  }],
 }, { 
   timestamps: true 
 });

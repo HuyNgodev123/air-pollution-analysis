@@ -4,7 +4,7 @@ import { HashLink } from 'react-router-hash-link';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext'; 
 // --- SỬA LỖI TẠI ĐÂY: Thêm Plus, Minus, Trash2 vào import ---
-import { ShoppingCart, X, ArrowRight, Trash2, Plus, Minus } from 'lucide-react'; 
+import { ShoppingCart, X, ArrowRight, Trash2, Plus, Minus, Shield } from 'lucide-react'; 
 import './style.css'; 
 
 function Header() {
@@ -32,6 +32,22 @@ function Header() {
     return <header className="app-header"><div className="container-1 header-container"></div></header>;
   }
 
+  // --- HÀM XỬ LÝ THANH TOÁN GIỎ HÀNG ---
+  const handleCheckout = () => {
+    // Đóng giỏ hàng trước khi chuyển trang
+    setIsCartOpen(false);
+    
+    // Chuyển hướng sang trang checkout
+    // Truyền toàn bộ danh sách sản phẩm trong giỏ hàng qua state
+    navigate('/checkout', { 
+      state: { 
+        cartItems: cartItems, // Danh sách sản phẩm
+        totalAmount: cartTotal // Tổng tiền (optional, vì trang checkout tự tính lại được)
+      } 
+    });
+  };
+
+
   return (
     <>
       <header className="app-header">
@@ -47,12 +63,56 @@ function Header() {
             <HashLink to="/#dashboard" className="nav-link">Dashboard</HashLink>
 
             {user ? (
-              <>
-                <span className="nav-link user-greeting">
-                  Chào, <strong>{user.name}</strong>
-                </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '15px', borderLeft: '1px solid #e5e7eb', paddingLeft: '15px', marginLeft: '10px' }}>
+                {/* 1. NÚT ADMIN (Chỉ hiện nếu là admin) */}
+                {user.role === 'admin' && (
+                  <Link 
+                    to="/admin" 
+                    className="nav-link"
+                    title="Trang quản trị"
+                    style={{ 
+                      color: '#7c3aed', 
+                      fontWeight: 'bold', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: '4px',
+                      backgroundColor: '#f3e8ff',
+                      padding: '6px 12px',
+                      borderRadius: '20px',
+                      fontSize: '0.85rem'
+                    }}
+                  >
+                    <Shield size={14} /> Admin
+                  </Link>
+                )}
+                {/* --- SỬA ĐOẠN NÀY: Dùng Link thay vì thẻ span để chuyển trang Profile --- */}
+                <Link 
+                  to="/profile" 
+                  className="nav-link user-greeting" 
+                  style={{ 
+                    textDecoration: 'none', 
+                    display: 'flex', 
+                    alignItems: 'center',
+                    cursor: 'pointer' 
+                  }}
+                >
+                  {user.picture ? (
+                    <img 
+                      src={user.picture} 
+                      alt={user.name} 
+                      style={{ 
+                        width: '24px', 
+                        height: '24px', 
+                        borderRadius: '50%', 
+                        marginRight: '8px',
+                        objectFit: 'cover'
+                      }} 
+                    />
+                  ) : null}
+                  <strong>{user.name}</strong>
+                </Link>
                 <button onClick={handleLogout} className="nav-link btn-logout">Đăng xuất</button>
-              </>
+              </div>
             ) : (
               <Link to="/login" className="nav-link login-link">Đăng nhập</Link>
             )}
@@ -118,7 +178,7 @@ function Header() {
                   <span>Tổng tiền:</span>
                   <span style={{ color: '#2563eb' }}>{formatPrice(cartTotal)}</span>
                 </div>
-                <button style={{ width: '100%', padding: '15px', background: '#2563eb', color: 'white', border: 'none', borderRadius: '8px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer' }}>
+                <button onClick={handleCheckout} style={{ width: '100%', padding: '15px', background: '#2563eb', color: 'white', border: 'none', borderRadius: '8px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer' }}>
                   Thanh toán ngay
                 </button>
               </div>

@@ -3,7 +3,6 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext'; // Import hook
 import { GoogleLogin } from '@react-oauth/google'; // Import nút Google
 
-// (Giả sử bạn có tệp CSS này)
 import './index.css'; 
 
 const LoginPage = () => {
@@ -53,7 +52,7 @@ const LoginPage = () => {
       if (!res.ok) throw data;
 
       login(data.token); // Lưu token vào context
-      navigate('/dashboard'); // Chuyển hướng
+      navigate('/'); // Chuyển hướng
 
     } catch (err) {
       setLoading(false);

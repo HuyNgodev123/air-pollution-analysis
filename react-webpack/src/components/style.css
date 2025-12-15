@@ -674,6 +674,79 @@
   color: #555;
 }
 
+/* tim vi tri user */
+.control-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.control-item label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 6px;
+}
+
+/* Label ẩn dùng để căn dòng cho nút GPS */
+.invisible-label {
+  visibility: hidden; 
+  height: 21px; /* Chiều cao tương đương label thật */
+}
+
+/* Input ngày tháng */
+.control-item input[type="date"] {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  height: 38px; /* Khớp chiều cao với React-Select mặc định */
+}
+
+/* Nút GPS nhỏ gọn */
+.btn-gps {
+  height: 38px;
+  width: 40px;
+  background-color: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  color: #2563eb;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.btn-gps:hover {
+  background-color: #e5e7eb;
+  color: #1d4ed8;
+  border-color: #9ca3af;
+}
+
+/* Nút GPS to (Hero button khi chưa chọn gì) */
+.btn-location-hero {
+  padding: 10px 20px;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+
+.btn-location-hero:hover {
+  background-color: #1d4ed8;
+}
+
+
+
+
+
+
 
 /* VideoSection.js */
 .video-section {
@@ -775,3 +848,4 @@ video.react-player {
     right: 15px;
   }
 }
+

@@ -55,7 +55,7 @@ const RegisterPage = () => {
 
       // Đăng ký thành công, tự động đăng nhập
       login(data.token); // Lưu token vào context
-      navigate('/dashboard'); // Chuyển hướng
+      navigate('/'); // Chuyển hướng
 
     } catch (err) {
       setLoading(false);
@@ -85,7 +85,7 @@ const RegisterPage = () => {
       setLoading(false);
       if (!res.ok) throw data;
       login(data.token);
-      navigate('/dashboard');
+      navigate('/');
     } catch (err) {
       setLoading(false);
       setError(err.error || 'Xác thực Google thất bại.');

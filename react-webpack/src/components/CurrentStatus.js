@@ -1,10 +1,7 @@
 import React from 'react';
 import './style.css'; 
 
-/**
- * Helper function để lấy thông tin (mức độ, màu sắc)
- * dựa trên chỉ số AQI
- */
+// Hàm helper để lấy thông tin màu sắc và mức độ ô nhiễm
 const getAQIInfo = (aqi) => {
   if (aqi <= 50) return { level: 'Tốt', colorClass: 'green' };
   if (aqi <= 100) return { level: 'Trung bình', colorClass: 'yellow' };
@@ -14,62 +11,61 @@ const getAQIInfo = (aqi) => {
   return { level: 'Nguy hại', colorClass: 'maroon' };
 };
 
-// Hàm helper mới để lấy lời khuyên sức khỏe
+// Hàm helper lấy lời khuyên sức khỏe
 const getHealthAdvice = (level) => {
   switch (level) {
     case 'Tốt':
-      return 'Chất lượng không khí tuyệt vời. Tận hưởng các hoạt động ngoài trời!';
+      return 'Không khí trong lành. Tuyệt vời cho các hoạt động ngoài trời!';
     case 'Trung bình':
-      return 'Chất lượng không khí ở mức chấp nhận được. Người nhạy cảm nên giảm bớt các hoạt động ngoài trời.';
+      return 'Chất lượng không khí chấp nhận được. Nhóm nhạy cảm nên hạn chế vận động mạnh ngoài trời.';
     case 'Kém':
-      return 'Người nhạy cảm có thể gặp vấn đề sức khỏe. Mọi người nên giảm bớt các hoạt động ngoài trời.';
+      return 'Người nhạy cảm có thể gặp vấn đề sức khỏe. Nên giảm bớt thời gian ở ngoài trời.';
     case 'Xấu':
-      return 'Mọi người có thể bắt đầu gặp các vấn đề sức khỏe. Nên giảm các hoạt động ngoài trời và đeo khẩu trang nếu ra ngoài.';
+      return 'Có hại cho sức khỏe mọi người. Nên đeo khẩu trang và hạn chế ra ngoài.';
     case 'Rất xấu':
-      return 'Cảnh báo sức khỏe nghiêm trọng. Tránh mọi hoạt động ngoài trời.';
+      return 'Cảnh báo sức khỏe khẩn cấp. Mọi người nên ở trong nhà.';
     case 'Nguy hại':
-      return 'Cảnh báo nguy hiểm! Mọi người nên ở trong nhà và đóng kín cửa sổ.';
+      return 'Mức độ nguy hiểm cao. Đóng kín cửa sổ và tránh mọi hoạt động ngoài trời.';
     default:
       return '';
   }
 };
 
-function CurrentStatus({ data }) {
-  // Vì 'data' chứa tất cả (pm25, pm10, aqi...),
-  // chúng ta cần tìm bản ghi 'aqi' mới nhất.
-  // Do data đã sắp xếp theo timestamp giảm dần, 
-  // bản ghi 'aqi' đầu tiên tìm thấy chính là mới nhất.
-  let latestData = data.find(item => item.parameter === 'aqi');
-  let isPm25Fallback = false;
-
-  // 2. Nếu không có 'aqi', tìm 'pm25' để thay thế
-  if (!latestData) {
-    latestData = data.find(item => item.parameter === 'pm25');
-    if (latestData) {
-      isPm25Fallback = true;
-    }
-  }
-  
-  // 3. Nếu không có cả hai, mới báo lỗi
-  if (!latestData) {
-    return <div className="current-status-card">Không tìm thấy dữ liệu AQI.</div>;
+function CurrentStatus({ data, cityName }) {
+  // Kiểm tra dữ liệu đầu vào
+  if (!data || data.aqi === undefined) {
+    return <div className="current-status-card error">Không có dữ liệu AQI.</div>;
   }
 
-  const { value, timestamp } = latestData;
-  const { level, colorClass } = getAQIInfo(value);
+  const { aqi, time } = data;
+  const { level, colorClass } = getAQIInfo(aqi);
   const advice = getHealthAdvice(level);
-  // Format lại thời gian cho dễ đọc
-  const time = new Date(timestamp).toLocaleString('vi-VN', {
-    hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit'
-  });
+  
+  // Format thời gian
+  const updateTime = time 
+    ? new Date(time).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' })
+    : 'Vừa cập nhật';
 
   return (
-    // Dùng class màu động để thay đổi background
     <div className={`current-status-card aqi-${colorClass}`}>
-      <div className="aqi-value-large">{value}</div>
-      <div className="aqi-level">{level}</div>
-      <p className="timestamp">Cập nhật lúc: {time}</p>
-      <p className="health-advice">{advice}</p>
+      {/* Header card: Tên thành phố & Thời gian */}
+      <div className="status-header">
+        <h3 className="city-name">{cityName || 'Vị trí hiện tại'}</h3>
+        <span className="timestamp">Tại thời điểm: {updateTime}</span>
+      </div>
+
+      {/* Phần hiển thị chỉ số chính */}
+      <div className="status-main">
+        <div className="aqi-badge">
+          <span className="aqi-value">{aqi}</span>
+          <span className="aqi-label">US AQI</span>
+        </div>
+        
+        <div className="aqi-text">
+          <div className="aqi-level">{level}</div>
+          <p className="health-advice">{advice}</p>
+        </div>
+      </div>
     </div>
   );
 }
