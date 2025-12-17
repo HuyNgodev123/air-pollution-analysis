@@ -8,7 +8,7 @@ function Footer() {
         <p>
           Đồ án thực tập - Phát triển bởi Student F8.
           <br />
-          Dữ liệu được cung cấp bởi <a href="https://waqi.info/" target="_blank" rel="noopener noreferrer">WAQI</a>.
+          Dữ liệu được cung cấp bởi <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">OPEN METEO</a>.
         </p>
       </div>
     </footer>

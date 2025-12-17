@@ -1,22 +1,22 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext'; // Import hook
-import { GoogleLogin } from '@react-oauth/google'; // Import nút Google
-import './index.css'; 
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext"; // Import hook
+import { GoogleLogin } from "@react-oauth/google"; // Import nút Google
+import "./index.css";
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: ''
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const { login } = useAuth(); // Lấy hàm login từ context
   const navigate = useNavigate();
-  
+
   const { name, email, password, confirmPassword } = formData;
 
   const handleChange = (e) => {
@@ -31,20 +31,20 @@ const RegisterPage = () => {
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    
+    setError("");
+
     // Kiểm tra mật khẩu
     if (password !== confirmPassword) {
-      setError('Mật khẩu nhập lại không khớp.');
+      setError("Mật khẩu nhập lại không khớp.");
       return;
     }
-    
+
     setLoading(true);
 
     try {
-      const res = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),
       });
 
@@ -55,15 +55,14 @@ const RegisterPage = () => {
 
       // Đăng ký thành công, tự động đăng nhập
       login(data.token); // Lưu token vào context
-      navigate('/'); // Chuyển hướng
-
+      navigate("/"); // Chuyển hướng
     } catch (err) {
       setLoading(false);
       console.error(err);
       if (err.errors && err.errors[0]) {
         setError(err.errors[0].msg); // Hiển thị lỗi từ server
       } else {
-        setError('Đăng ký thất bại. Vui lòng thử lại.');
+        setError("Đăng ký thất bại. Vui lòng thử lại.");
       }
     }
   };
@@ -72,28 +71,28 @@ const RegisterPage = () => {
    * @desc XỬ LÝ KHI GOOGLE TRẢ VỀ (Giống hệt LoginPage)
    */
   const handleGoogleSuccess = async (credentialResponse) => {
-    setError('');
+    setError("");
     setLoading(true);
     try {
       const googleToken = credentialResponse.credential;
-      const res = await fetch('/api/auth/google', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/auth/google", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token: googleToken }),
       });
       const data = await res.json();
       setLoading(false);
       if (!res.ok) throw data;
       login(data.token);
-      navigate('/');
+      navigate("/");
     } catch (err) {
       setLoading(false);
-      setError(err.error || 'Xác thực Google thất bại.');
+      setError(err.error || "Xác thực Google thất bại.");
     }
   };
 
   const handleGoogleError = () => {
-    setError('Đăng nhập Google thất bại.');
+    setError("Đăng nhập Google thất bại.");
   };
 
   return (
@@ -108,66 +107,64 @@ const RegisterPage = () => {
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="name">Tên hiển thị</label>
-            <input 
-              type="text" 
-              id="name" 
+            <input
+              type="text"
+              id="name"
               name="name"
-              value={name} 
+              value={name}
               onChange={handleChange}
-              placeholder="Tên của bạn" 
-              required 
+              placeholder="Tên của bạn"
+              required
             />
           </div>
           <div className="form-group">
             <label htmlFor="email">Email</label>
-            <input 
-              type="email" 
-              id="email" 
+            <input
+              type="email"
+              id="email"
               name="email"
-              value={email} 
+              value={email}
               onChange={handleChange}
-              placeholder="Email" 
-              required 
+              placeholder="Email"
+              required
             />
           </div>
           <div className="form-group">
             <label htmlFor="password">Mật khẩu</label>
-            <input 
-              type="password" 
-              id="password" 
+            <input
+              type="password"
+              id="password"
               name="password"
-              value={password} 
+              value={password}
               onChange={handleChange}
-              placeholder="Nhập mật khẩu" 
-              required 
+              placeholder="Nhập mật khẩu"
+              required
               minLength="6"
             />
           </div>
-           <div className="form-group">
+          <div className="form-group">
             <label htmlFor="confirmPassword">Xác nhận Mật khẩu</label>
-            <input 
-              type="password" 
-              id="confirmPassword" 
+            <input
+              type="password"
+              id="confirmPassword"
               name="confirmPassword"
-              value={confirmPassword} 
+              value={confirmPassword}
               onChange={handleChange}
-              placeholder="Nhập lại mật khẩu" 
-              required 
+              placeholder="Nhập lại mật khẩu"
+              required
             />
           </div>
-          
-          {error && <p style={{ color: 'red', marginBottom: '1rem' }}>{error}</p>}
 
-          <button 
-            type="submit" 
-            className="btn btn-primary" 
-            disabled={loading}
-          >
-            {loading ? 'Đang xử lý...' : 'Tạo tài khoản'}
+          {error && (
+            <p style={{ color: "red", marginBottom: "1rem" }}>{error}</p>
+          )}
+
+          <button type="submit" className="btn btn-primary" disabled={loading}>
+            {loading ? "Đang xử lý..." : "Tạo tài khoản"}
           </button>
         </form>
 
-        <div className="divider" style={{ textAlign: 'center' }}>
+        <div className="divider" style={{ textAlign: "center" }}>
           Hoặc đăng ký với
         </div>
 

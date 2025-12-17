@@ -1,64 +1,132 @@
-import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { ArrowLeft, CreditCard, Truck, CheckCircle, QrCode } from 'lucide-react';
-import './index.css';
+import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import {
+  ArrowLeft,
+  CreditCard,
+  Truck,
+  CheckCircle,
+  QrCode,
+} from "lucide-react";
+import { useCart } from "../context/CartContext";
+import "./index.css";
 
 const CheckoutPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  
-  const [orderItems, setOrderItems] = useState([]);
-  
+
+  const [orderItems, setOrderItems] = useState(() => {
+    // Khởi tạo danh sách sản phẩm từ state truyền qua
+    if (location.state?.product) return [location.state.product];
+    if (location.state?.cartItems) return location.state.cartItems;
+    return [];
+  });
+
   useEffect(() => {
     // Ưu tiên 1: Dữ liệu từ nút "Mua ngay" (1 sản phẩm)
     if (location.state?.product) {
       setOrderItems([location.state.product]);
-    } 
+    }
     // Ưu tiên 2: Dữ liệu từ nút "Thanh toán giỏ hàng" (Nhiều sản phẩm)
     else if (location.state?.cartItems && location.state.cartItems.length > 0) {
       setOrderItems(location.state.cartItems);
     }
   }, [location.state]);
 
-  const [paymentMethod, setPaymentMethod] = useState('cod');
+  const [paymentMethod, setPaymentMethod] = useState("cod");
   const [isSuccess, setIsSuccess] = useState(false);
   const [showQR, setShowQR] = useState(false);
 
   // Hàm format giá tiền
-  const formatPrice = (p) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p);
+  const formatPrice = (p) =>
+    new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(p);
 
   // Tính tổng tiền đơn hàng
   // Lưu ý: Nếu sản phẩm không có quantity (khi mua ngay), mặc định là 1
-  const totalAmount = orderItems.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
+  const totalAmount = orderItems.reduce(
+    (sum, item) => sum + item.price * (item.quantity || 1),
+    0
+  );
 
-  // --- THÔNG TIN TÀI KHOẢN NHẬN TIỀN (Sửa lại theo của bạn) ---
-  const BANK_ID = "MB"; // Ngân hàng MBBank (hoặc VCB, TCB...)
-  const ACCOUNT_NO = "0352089999"; // Số tài khoản của bạn
-  const ACCOUNT_NAME = "NGUYEN VAN A"; // Tên chủ tài khoản
+  // --- THÔNG TIN TÀI KHOẢN NHẬN TIỀN  ---
+  const BANK_ID = "MB";
+  const ACCOUNT_NO = "20001122334455";
+  const ACCOUNT_NAME = "Ngo Nhat Huy";
   const ORDER_ID = Math.floor(Math.random() * 10000); // Mã đơn hàng giả lập
-  
+
   // Link tạo QR động từ VietQR (QuickLink) - Tự động điền số tiền và nội dung
-  const qrUrl = `https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NO}-compact2.jpg?amount=${totalAmount}&addInfo=DH${ORDER_ID}&accountName=${encodeURIComponent(ACCOUNT_NAME)}`;
+  const qrUrl = `https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NO}-compact2.jpg?amount=${totalAmount}&addInfo=DH${ORDER_ID}&accountName=${encodeURIComponent(
+    ACCOUNT_NAME
+  )}`;
 
   // Nếu không có sản phẩm nào (người dùng gõ link trực tiếp) -> Báo lỗi & Quay về
   if (orderItems.length === 0) {
     return (
       <div className="checkout-container error">
-        <div style={{textAlign: 'center', padding: '50px'}}>
-          <p style={{fontSize: '18px', color: '#666', marginBottom: '20px'}}>
-             Chưa có sản phẩm nào được chọn để thanh toán.
+        <div style={{ textAlign: "center", padding: "50px" }}>
+          <p style={{ fontSize: "18px", color: "#666", marginBottom: "20px" }}>
+            Chưa có sản phẩm nào được chọn để thanh toán.
           </p>
-          <button onClick={() => navigate('/products')} className="btn-back-link" style={{margin: '0 auto', fontSize: '16px', padding: '10px 20px', background: '#2563eb', color: 'white', borderRadius: '8px', border: 'none'}}>
-             <ArrowLeft size={18} style={{marginRight: '8px'}}/> Quay lại mua sắm
+          <button
+            onClick={() => navigate("/products")}
+            className="btn-back-link"
+            style={{
+              margin: "0 auto",
+              fontSize: "16px",
+              padding: "10px 20px",
+              background: "#2563eb",
+              color: "white",
+              borderRadius: "8px",
+              border: "none",
+            }}
+          >
+            <ArrowLeft size={18} style={{ marginRight: "8px" }} /> Quay lại mua
+            sắm
           </button>
         </div>
       </div>
     );
   }
 
+  // --- HÀM GỌI API LƯU ĐƠN HÀNG ---
+  const saveOrderToHistory = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      // Nếu không có token (chưa đăng nhập), có thể bỏ qua hoặc yêu cầu đăng nhập
+      if (!token) return;
+
+      await fetch("/api/user/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-auth-token": token,
+        },
+        body: JSON.stringify({
+          orderId: `DH${ORDER_ID}`,
+          items: orderItems.map((item) => ({
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity || 1,
+            image: item.image,
+          })),
+          totalAmount: totalAmount,
+          paymentMethod:
+            paymentMethod === "cod"
+              ? "Thanh toán khi nhận hàng (COD)"
+              : "Chuyển khoản ngân hàng",
+        }),
+      });
+      // Không cần chờ kết quả trả về để UI mượt mà hơn
+    } catch (err) {
+      console.error("Lỗi lưu đơn hàng:", err);
+    }
+  };
+
   const handlePayment = (e) => {
     e.preventDefault();
-    if (paymentMethod === 'banking') {
+    if (paymentMethod === "banking") {
       // Nếu chọn chuyển khoản -> Hiện QR để quét
       setShowQR(true);
     } else {
@@ -67,13 +135,20 @@ const CheckoutPage = () => {
     }
   };
 
-  const finishOrder = () => {
+  // Hoàn tất đơn hàng
+  const finishOrder = async () => {
+    // 1. Gọi API lưu vào lịch sử (chạy ngầm)
+    await saveOrderToHistory();
+    // 2. Hiển thị thông báo thành công
     setIsSuccess(true);
-    setShowQR(false); // Tắt popup QR nếu đang mở
+    setShowQR(false);
+
+    // 3. Chuyển hướng sau 2 giây
     setTimeout(() => {
-        alert(`Đặt hàng thành công! Mã đơn: DH${ORDER_ID}`);
-        // Ở đây bạn có thể gọi hàm clearCart() từ Context nếu muốn xóa giỏ hàng sau khi mua
-        navigate('/'); // Quay về trang chủ
+      alert(`Đặt hàng thành công! Mã đơn: DH${ORDER_ID}`);
+      // Nếu có hàm clearCart từ context thì gọi ở đây để xóa giỏ hàng
+      // clearCart();
+      navigate("/");
     }, 2000);
   };
 
@@ -98,37 +173,59 @@ const CheckoutPage = () => {
             </div>
             <div className="form-group">
               <label>Địa chỉ nhận hàng</label>
-              <textarea placeholder="Số nhà, đường, phường/xã..." required rows="3"></textarea>
+              <textarea
+                placeholder="Số nhà, đường, phường/xã..."
+                required
+                rows="3"
+              ></textarea>
             </div>
 
             <h2 className="section-title mt-4">Phương thức thanh toán</h2>
             <div className="payment-methods">
-              <label className={`payment-option ${paymentMethod === 'cod' ? 'selected' : ''}`}>
-                <input 
-                  type="radio" 
-                  name="payment" 
-                  value="cod" 
-                  checked={paymentMethod === 'cod'}
-                  onChange={() => setPaymentMethod('cod')}
+              <label
+                className={`payment-option ${
+                  paymentMethod === "cod" ? "selected" : ""
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="payment"
+                  value="cod"
+                  checked={paymentMethod === "cod"}
+                  onChange={() => setPaymentMethod("cod")}
                 />
-                <div className="payment-icon"><Truck size={24} /></div>
+                <div className="payment-icon">
+                  <Truck size={24} />
+                </div>
                 <div className="payment-info">
-                  <span className="payment-name">Thanh toán khi nhận hàng (COD)</span>
-                  <span className="payment-desc">Thanh toán tiền mặt cho shipper.</span>
+                  <span className="payment-name">
+                    Thanh toán khi nhận hàng (COD)
+                  </span>
+                  <span className="payment-desc">
+                    Thanh toán tiền mặt cho shipper.
+                  </span>
                 </div>
               </label>
 
-              <label className={`payment-option ${paymentMethod === 'banking' ? 'selected' : ''}`}>
-                <input 
-                  type="radio" 
-                  name="payment" 
-                  value="banking" 
-                  checked={paymentMethod === 'banking'}
-                  onChange={() => setPaymentMethod('banking')}
+              <label
+                className={`payment-option ${
+                  paymentMethod === "banking" ? "selected" : ""
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="payment"
+                  value="banking"
+                  checked={paymentMethod === "banking"}
+                  onChange={() => setPaymentMethod("banking")}
                 />
-                <div className="payment-icon"><QrCode size={24} /></div>
+                <div className="payment-icon">
+                  <QrCode size={24} />
+                </div>
                 <div className="payment-info">
-                  <span className="payment-name">Chuyển khoản ngân hàng (QR Code)</span>
+                  <span className="payment-name">
+                    Chuyển khoản ngân hàng (QR Code)
+                  </span>
                   <span className="payment-desc">Quét mã VietQR tự động.</span>
                 </div>
               </label>
@@ -140,7 +237,7 @@ const CheckoutPage = () => {
         <div className="checkout-right">
           <div className="order-summary">
             <h3>Đơn hàng ({orderItems.length} sản phẩm)</h3>
-            
+
             <div className="order-items-list">
               {orderItems.map((item, index) => (
                 <div key={index} className="product-mini">
@@ -148,18 +245,30 @@ const CheckoutPage = () => {
                   <div>
                     <h4>{item.name}</h4>
                     <p className="product-cat">{item.category}</p>
-                    <div style={{display:'flex', justifyContent:'space-between', width: '100%'}}>
-                       <p className="product-price">{formatPrice(item.price)}</p>
-                       {/* Hiển thị số lượng nếu có, mặc định là 1 */}
-                       <span style={{fontSize: '13px', color:'#666', fontWeight: 'bold'}}>
-                         x{item.quantity || 1}
-                       </span>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        width: "100%",
+                      }}
+                    >
+                      <p className="product-price">{formatPrice(item.price)}</p>
+                      {/* Hiển thị số lượng nếu có, mặc định là 1 */}
+                      <span
+                        style={{
+                          fontSize: "13px",
+                          color: "#666",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        x{item.quantity || 1}
+                      </span>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
-            
+
             <div className="summary-row">
               <span>Tạm tính</span>
               <span>{formatPrice(totalAmount)}</span>
@@ -175,7 +284,13 @@ const CheckoutPage = () => {
             </div>
 
             <button type="submit" form="checkout-form" className="btn-confirm">
-              {isSuccess ? <CheckCircle size={20} /> : (paymentMethod === 'banking' ? 'Tiếp tục thanh toán' : 'Đặt hàng ngay')}
+              {isSuccess ? (
+                <CheckCircle size={20} />
+              ) : paymentMethod === "banking" ? (
+                "Tiếp tục thanh toán"
+              ) : (
+                "Đặt hàng ngay"
+              )}
             </button>
           </div>
         </div>
@@ -187,22 +302,30 @@ const CheckoutPage = () => {
           <div className="qr-modal">
             <h3>Thanh toán qua VietQR</h3>
             <p>Vui lòng mở App Ngân hàng và quét mã bên dưới</p>
-            
+
             <div className="qr-image-wrapper">
               <img src={qrUrl} alt="Mã QR VietQR" />
             </div>
 
             <div className="qr-info">
-              <p>Số tiền: <strong>{formatPrice(totalAmount)}</strong></p>
-              <p>Nội dung: <strong>DH{ORDER_ID}</strong></p>
-              <p style={{fontSize: '12px', color: '#888', marginTop: '5px'}}>
+              <p>
+                Số tiền: <strong>{formatPrice(totalAmount)}</strong>
+              </p>
+              <p>
+                Nội dung: <strong>DH{ORDER_ID}</strong>
+              </p>
+              <p style={{ fontSize: "12px", color: "#888", marginTop: "5px" }}>
                 (Hệ thống sẽ tự động xác nhận sau khi bạn chuyển khoản)
               </p>
             </div>
 
             <div className="qr-actions">
-              <button onClick={() => setShowQR(false)} className="btn-cancel">Quay lại</button>
-              <button onClick={finishOrder} className="btn-done">Đã chuyển khoản xong</button>
+              <button onClick={() => setShowQR(false)} className="btn-cancel">
+                Quay lại
+              </button>
+              <button onClick={finishOrder} className="btn-done">
+                Đã chuyển khoản xong
+              </button>
             </div>
           </div>
         </div>

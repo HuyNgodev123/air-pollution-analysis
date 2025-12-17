@@ -1,16 +1,16 @@
-import React from 'react';
-import './style.css'; // Hoặc file css riêng của bạn
+import React from "react";
+import "./style.css"; // Hoặc file css riêng của bạn
 
 // Danh sách các chất ô nhiễm cần hiển thị
 // 'key' phải khớp với tên thuộc tính trả về từ airQualityService.js
 const POLLUTANT_PARAMS = [
-  { key: 'pm25', name: 'PM2.5', unit: 'µg/m³' },
-  { key: 'pm10', name: 'PM10', unit: 'µg/m³' },
-  { key: 'o3', name: 'Ozone (O₃)', unit: 'µg/m³' },
-  { key: 'no2', name: 'NO₂', unit: 'µg/m³' },
-  { key: 'so2', name: 'SO₂', unit: 'µg/m³' },
-  { key: 'co', name: 'CO', unit: 'µg/m³' },
-  { key: 'uv', name: 'Tia cực tím (UV)', unit: '' },
+  { key: "pm25", name: "PM2.5", unit: "µg/m³" },
+  { key: "pm10", name: "PM10", unit: "µg/m³" },
+  { key: "o3", name: "Ozone (O₃)", unit: "µg/m³" },
+  { key: "no2", name: "NO₂", unit: "µg/m³" },
+  { key: "so2", name: "SO₂", unit: "µg/m³" },
+  { key: "co", name: "CO", unit: "µg/m³" },
+  { key: "uv", name: "Tia cực tím (UV)", unit: "" },
 ];
 
 function PollutantDetails({ data }) {
@@ -20,14 +20,14 @@ function PollutantDetails({ data }) {
   // --- HÀM FORMAT GIÁ TRỊ (để hiển thị đẹp hơn nếu cần, ví dụ làm tròn) ---
   // Lưu ý: Đây không phải formatPrice (tiền tệ) mà là format chỉ số ô nhiễm
   const formatValue = (val) => {
-    if (val === null || val === undefined) return '-';
-    return val; 
+    if (val === null || val === undefined) return "-";
+    return val;
   };
 
   return (
     <div className="details-container">
       <h3 className="details-title">Chi tiết các chỉ số đo lường</h3>
-      
+
       <div className="details-grid">
         {POLLUTANT_PARAMS.map((param) => {
           // Lấy giá trị trực tiếp từ object data (VD: data.pm25)

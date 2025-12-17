@@ -1,15 +1,15 @@
-import express from 'express';
-import { OAuth2Client } from 'google-auth-library';
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs'; // Thêm thư viện hash mật khẩu
+import express from "express";
+import { OAuth2Client } from "google-auth-library";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs"; // Thêm thư viện hash mật khẩu
 // import { check, validationResult } from 'express-validator'; // (Tùy chọn) Để xác thực
-import User from '../models/User.js'; // Đảm bảo đường dẫn này đúng
+import User from "../models/User.js"; // Đảm bảo đường dẫn này đúng
 
 const router = express.Router();
 
 // Lấy Client ID và Secret từ file .env
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID_FROM_CLOUD;
-const JWT_SECRET = process.env.JWT_SECRET || 'your-fallback-secret-key';
+const JWT_SECRET = process.env.JWT_SECRET || "your-fallback-secret-key";
 
 // Tạo một client của Google
 const client = new OAuth2Client(GOOGLE_CLIENT_ID);
@@ -28,10 +28,9 @@ const generateAppToken = (user) => {
   return jwt.sign(
     appTokenPayload,
     JWT_SECRET,
-    { expiresIn: '7d' } // Hết hạn trong 7 ngày
+    { expiresIn: "7d" } // Hết hạn trong 7 ngày
   );
 };
-
 
 // === TUYẾN ĐƯỜNG ĐĂNG NHẬP GOOGLE ===
 
@@ -39,12 +38,12 @@ const generateAppToken = (user) => {
  * @route   POST /api/auth/google
  * @desc    Xác thực người dùng bằng Google Token (thường là idToken)
  */
-router.post('/google', async (req, res) => {
+router.post("/google", async (req, res) => {
   try {
     const { token } = req.body; // 'token' này là idToken từ Google Sign-In
 
     if (!token) {
-      return res.status(400).json({ error: 'Không có token nào được gửi' });
+      return res.status(400).json({ error: "Không có token nào được gửi" });
     }
 
     // 1. Xác thực token với Google
@@ -64,7 +63,7 @@ router.post('/google', async (req, res) => {
     } = payload;
 
     if (!email || !googleId) {
-      return res.status(400).json({ error: 'Xác thực Google thất bại' });
+      return res.status(400).json({ error: "Xác thực Google thất bại" });
     }
 
     // 3. Tìm hoặc Tạo người dùng trong DB
@@ -91,16 +90,16 @@ router.post('/google', async (req, res) => {
     // 4. Tạo và trả về token của app
     const appToken = generateAppToken(user);
     res.json({ token: appToken });
-
   } catch (err) {
-    console.error('Lỗi xác thực /api/auth/google:', err.message);
-    if (err.message.includes('Token used too late')) {
-        return res.status(401).json({ error: 'Token đã hết hạn hoặc không hợp lệ.'});
+    console.error("Lỗi xác thực /api/auth/google:", err.message);
+    if (err.message.includes("Token used too late")) {
+      return res
+        .status(401)
+        .json({ error: "Token đã hết hạn hoặc không hợp lệ." });
     }
-    res.status(500).json({ error: 'Lỗi Server' });
+    res.status(500).json({ error: "Lỗi Server" });
   }
 });
-
 
 // === TUYẾN ĐƯỜNG ĐĂNG KÝ EMAIL/PASSWORD ===
 
@@ -109,7 +108,7 @@ router.post('/google', async (req, res) => {
  * @desc    Đăng ký tài khoản mới bằng Email & Mật khẩu
  */
 router.post(
-  '/register',
+  "/register",
   // (Tùy chọn: Thêm xác thực đầu vào từ 'express-validator' ở đây)
   // [
   //   check('name', 'Tên là bắt buộc').not().isEmpty(),
@@ -133,7 +132,9 @@ router.post(
         // Nếu người dùng đã tồn tại
         if (user.password) {
           // Nếu họ đã có mật khẩu -> Lỗi
-          return res.status(400).json({ errors: [{ msg: 'Email đã được sử dụng' }] });
+          return res
+            .status(400)
+            .json({ errors: [{ msg: "Email đã được sử dụng" }] });
         } else {
           // Nếu họ tồn tại (qua Google) nhưng chưa có pass
           // -> Cập nhật tài khoản của họ với mật khẩu mới
@@ -141,7 +142,7 @@ router.post(
           const salt = await bcrypt.genSalt(10);
           user.password = await bcrypt.hash(password, salt);
           await user.save();
-          
+
           // Đăng nhập và trả token
           const appToken = generateAppToken(user);
           return res.json({ token: appToken });
@@ -165,10 +166,9 @@ router.post(
       // 5. Tạo và trả về token
       const appToken = generateAppToken(user);
       res.json({ token: appToken });
-
     } catch (err) {
       console.error(err.message);
-      res.status(500).send('Lỗi Server');
+      res.status(500).send("Lỗi Server");
     }
   }
 );
@@ -180,7 +180,7 @@ router.post(
  * @desc    Đăng nhập bằng Email & Mật khẩu
  */
 router.post(
-  '/login',
+  "/login",
   // (Tùy chọn: Xác thực)
   // [
   //   check('email', 'Vui lòng nhập email hợp lệ').isEmail(),
@@ -200,17 +200,21 @@ router.post(
       let user = await User.findOne({ email });
 
       if (!user) {
-        return res.status(400).json({ errors: [{ msg: 'Email hoặc mật khẩu không đúng' }] });
+        return res
+          .status(400)
+          .json({ errors: [{ msg: "Email hoặc mật khẩu không đúng" }] });
       }
 
       // 2. Kiểm tra xem người dùng có mật khẩu không
       // (Trường hợp họ đăng ký bằng Google và chưa tạo pass)
       if (!user.password) {
-        return res.status(400).json({ 
-          errors: [{ 
-            msg: 'Tài khoản này đã đăng nhập bằng Google. Vui lòng đăng nhập bằng Google.',
-            needsGoogleLogin: true // Gửi cờ này về để frontend xử lý
-          }] 
+        return res.status(400).json({
+          errors: [
+            {
+              msg: "Tài khoản này đã đăng nhập bằng Google. Vui lòng đăng nhập bằng Google.",
+              needsGoogleLogin: true, // Gửi cờ này về để frontend xử lý
+            },
+          ],
         });
       }
 
@@ -218,19 +222,19 @@ router.post(
       const isMatch = await bcrypt.compare(password, user.password);
 
       if (!isMatch) {
-        return res.status(400).json({ errors: [{ msg: 'Email hoặc mật khẩu không đúng' }] });
+        return res
+          .status(400)
+          .json({ errors: [{ msg: "Email hoặc mật khẩu không đúng" }] });
       }
 
       // 4. Nếu khớp, trả về token
       const appToken = generateAppToken(user);
       res.json({ token: appToken });
-
     } catch (err) {
       console.error(err.message);
-      res.status(500).send('Lỗi Server');
+      res.status(500).send("Lỗi Server");
     }
   }
 );
-
 
 export default router;

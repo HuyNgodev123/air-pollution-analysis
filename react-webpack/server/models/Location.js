@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const LocationSchema = new mongoose.Schema({
   // ID dùng để gọi API WAQI (ví dụ: 'hanoi' hoặc '@14642')
@@ -21,9 +21,9 @@ const LocationSchema = new mongoose.Schema({
   // Loại ID: 'city' (tổng hợp) hoặc 'station' (trạm)
   type: {
     type: String,
-    enum: ['city', 'station'],
+    enum: ["city", "station"],
     required: true,
-  }
+  },
 });
 
-export default mongoose.model('Location', LocationSchema);
+export default mongoose.model("Location", LocationSchema);

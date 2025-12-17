@@ -104,6 +104,38 @@ router.put('/profile', auth, async (req, res) => {
 });
 
 
+// --- API MỚI: LƯU ĐƠN HÀNG (Order History) ---
+router.post('/orders', auth, async (req, res) => {
+  const { orderId, items, totalAmount, paymentMethod } = req.body;
+
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ msg: 'User not found' });
+
+    // Tạo object đơn hàng mới
+    const newOrder = {
+      orderId,
+      items,
+      totalAmount,
+      paymentMethod,
+      createdAt: new Date()
+    };
+
+    // Thêm vào đầu danh sách lịch sử mua hàng
+    // (Đảm bảo model User đã có trường orderHistory như bạn đã cập nhật)
+    if (!user.orderHistory) {
+        user.orderHistory = [];
+    }
+    user.orderHistory.unshift(newOrder);
+    
+    await user.save();
+    res.json(user.orderHistory);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Lỗi Server khi lưu đơn hàng');
+  }
+});
+
 
 // 2. CÁC API QUẢN TRỊ (Chỉ Admin mới gọi được)
 // Lấy danh sách TOÀN BỘ user

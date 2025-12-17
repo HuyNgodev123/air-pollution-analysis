@@ -1,41 +1,44 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-const MeasurementSchema = new mongoose.Schema({
-  // city: ID ('hanoi' or '@12345')
-  city: {
-    type: String,
-    required: true,
+const MeasurementSchema = new mongoose.Schema(
+  {
+    // city: ID ('hanoi' or '@12345')
+    city: {
+      type: String,
+      required: true,
+    },
+    location: {
+      type: String,
+    },
+    parameter: {
+      type: String,
+      required: true,
+    },
+    value: {
+      type: Number,
+      required: true,
+    },
+    unit: {
+      type: String,
+    },
+    timestamp: {
+      type: Date,
+      required: true,
+    },
+    coordinates: {
+      type: { type: String, enum: ["Point"], default: "Point" },
+      coordinates: { type: [Number] }, // [lon, lat]
+    },
+    source: {
+      type: String,
+      default: "waqi",
+    },
   },
-  location: {
-    type: String,
-  },
-  parameter: {
-    type: String,
-    required: true,
-  },
-  value: {
-    type: Number,
-    required: true,
-  },
-  unit: {
-    type: String,
-  },
-  timestamp: {
-    type: Date,
-    required: true,
-  },
-  coordinates: {
-    type: { type: String, enum: ['Point'], default: 'Point' },
-    coordinates: { type: [Number] } // [lon, lat]
-  },
-  source: {
-    type: String,
-    default: 'waqi'
+  {
+    // Thêm tùy chọn timestamps để biết khi nào bản ghi được tạo/cập nhật
+    timestamps: true,
   }
-}, { 
-  // Thêm tùy chọn timestamps để biết khi nào bản ghi được tạo/cập nhật
-  timestamps: true 
-});
+);
 
 // === BẮT ĐẦU THÊM MỚI: THÊM INDEX ===
 // Thêm một compound index (index gộp)
@@ -47,4 +50,4 @@ const MeasurementSchema = new mongoose.Schema({
 MeasurementSchema.index({ city: 1, timestamp: -1, parameter: 1 });
 // === KẾT THÚC THÊM MỚI ===
 
-export default mongoose.model('Measurement', MeasurementSchema);
+export default mongoose.model("Measurement", MeasurementSchema);
