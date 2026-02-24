@@ -5,7 +5,7 @@ dotenv.config(); // nạp biến môi trường
 
 const connectDB = async () => {
   try {
-    console.log("🔍 MongoDB URI:", process.env.MONGODB_URI); // để kiểm tra
+    console.log("MongoDB URI:", process.env.MONGODB_URI); // để kiểm tra
     const conn = await mongoose.connect(process.env.MONGODB_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
