@@ -1,7 +1,7 @@
 # Bỏ qua các thư viện
 react-webpack/node_modules
 
-# Bỏ qua code đã build
+# Bỏ qua code đã buildgit 
 react-webpack/build
 
 # Bỏ qua file biến môi trường

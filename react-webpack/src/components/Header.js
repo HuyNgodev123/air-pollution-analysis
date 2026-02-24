@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { HashLink } from "react-router-hash-link";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
-// --- SỬA LỖI TẠI ĐÂY: Thêm Plus, Minus, Trash2 vào import ---
+// --- Thêm Plus, Minus, Trash2 vào import ---
 import { ShoppingCart, X, ArrowRight, Trash2, Plus, Minus } from "lucide-react";
 import "./style.css";
 

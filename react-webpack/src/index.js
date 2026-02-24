@@ -6,6 +6,9 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
+
 import Dashboard from './components/Dashboard'
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -39,6 +42,12 @@ function App() {
 
                     {/* Trang (path="/register") sẽ render RegisterPage */}
                     <Route path="/register" element={<RegisterPage />} />
+
+                    {/* --- THÊM ROUTE QUÊN MẬT KHẨU --- */}
+                    <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                    
+                    {/* Route đặt lại mật khẩu (có kèm token trên URL) */}
+                    <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
 
                     {/* --- 2. THÊM ROUTE CHO SẢN PHẨM Ở ĐÂY --- */}
                     <Route path="/products" element={<ProductsPage />} />

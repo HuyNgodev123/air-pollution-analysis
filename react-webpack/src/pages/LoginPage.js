@@ -92,7 +92,7 @@ const LoginPage = () => {
       login(data.token);
 
       console.log("Đã nhận token của app, đang chuyển về trang dashboard...");
-      navigate('/dashboard'); // Chuyển hướng
+      navigate('/'); // Chuyển hướng
 
     } catch (err) {
       setLoading(false);

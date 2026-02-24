@@ -6,6 +6,10 @@ import "./style.css";
 
 // --- DANH SÁCH CÁC ĐIỂM ĐO MẶC ĐỊNH (VIỆT NAM) ---
 const LOCATIONS = [
+  // --- Biển Đảo Việt Nam (QUAN TRỌNG) ---
+  { id: "hoangsa", name: "Huyện đảo Hoàng Sa (Đà Nẵng)", lat: 16.5449, lon: 111.6092 }, // Tọa độ Hoàng Sa
+  { id: "truongsa", name: "Huyện đảo Trường Sa (Khánh Hòa)", lat: 10.5000, lon: 111.9194 }, // Tọa độ Trường Sa
+
   // Miền Bắc
   { id: "hanoi", name: "Hà Nội", lat: 21.0285, lon: 105.8542 },
   { id: "haiphong", name: "Hải Phòng", lat: 20.8449, lon: 106.6881 },
@@ -98,14 +102,14 @@ const AQIMap = () => {
   return (
     <div className="aqi-map-wrapper">
       <MapContainer
-        center={[16.0, 106.0]} // Tọa độ trung tâm Việt Nam
+        center={[14.0, 110.0]} // Tọa độ trung tâm Việt Nam
         zoom={5} // Zoom vừa đủ để thấy cả nước
         scrollWheelZoom={true}
         className="leaflet-map"
       >
         <TileLayer
-          attribution="&copy; OpenStreetMap contributors"
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community'
+          url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
         />
 
         {/* Render danh sách các điểm đo */}

@@ -12,7 +12,7 @@ async function fetchAllSourcesForCity(city) {
   }
 }
 
-// === BẮT ĐẦU SỬA LỖI: Quay lại vòng lặp tuần tự ===
+// ===  Quay lại vòng lặp tuần tự ===
 async function pollOnce() {
   let citiesToPoll = [];
   try {

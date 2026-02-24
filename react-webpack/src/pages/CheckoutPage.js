@@ -7,61 +7,63 @@ import {
   CheckCircle,
   QrCode,
 } from "lucide-react";
-import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 import "./index.css";
 
 const CheckoutPage = () => {
+  // --- LẤY USER VÀ TRẠNG THÁI AUTH ---
+  const { user, isAuthReady } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
   const [orderItems, setOrderItems] = useState(() => {
-    // Khởi tạo danh sách sản phẩm từ state truyền qua
     if (location.state?.product) return [location.state.product];
     if (location.state?.cartItems) return location.state.cartItems;
     return [];
   });
 
+  // --- 3. SỬA ĐỔI: THÊM LOGIC KIỂM TRA ĐĂNG NHẬP ---
   useEffect(() => {
-    // Ưu tiên 1: Dữ liệu từ nút "Mua ngay" (1 sản phẩm)
-    if (location.state?.product) {
-      setOrderItems([location.state.product]);
+    // Chỉ kiểm tra khi Auth đã tải xong (isAuthReady = true)
+    if (isAuthReady && !user) {
+      alert("Vui lòng đăng nhập để tiến hành thanh toán!");
+      navigate("/login");
     }
-    // Ưu tiên 2: Dữ liệu từ nút "Thanh toán giỏ hàng" (Nhiều sản phẩm)
-    else if (location.state?.cartItems && location.state.cartItems.length > 0) {
-      setOrderItems(location.state.cartItems);
-    }
-  }, [location.state]);
+  }, [user, isAuthReady, navigate]);
 
   const [paymentMethod, setPaymentMethod] = useState("cod");
   const [isSuccess, setIsSuccess] = useState(false);
   const [showQR, setShowQR] = useState(false);
 
-  // Hàm format giá tiền
   const formatPrice = (p) =>
     new Intl.NumberFormat("vi-VN", {
       style: "currency",
       currency: "VND",
     }).format(p);
 
-  // Tính tổng tiền đơn hàng
-  // Lưu ý: Nếu sản phẩm không có quantity (khi mua ngay), mặc định là 1
   const totalAmount = orderItems.reduce(
     (sum, item) => sum + item.price * (item.quantity || 1),
     0
   );
 
-  // --- THÔNG TIN TÀI KHOẢN NHẬN TIỀN  ---
   const BANK_ID = "MB";
-  const ACCOUNT_NO = "20001122334455";
-  const ACCOUNT_NAME = "Ngo Nhat Huy";
-  const ORDER_ID = Math.floor(Math.random() * 10000); // Mã đơn hàng giả lập
+  const ACCOUNT_NO = "20001122334455"; 
+  const ACCOUNT_NAME = "NGO NHAT HUY"; 
+  const ORDER_ID = Math.floor(Math.random() * 10000);
 
-  // Link tạo QR động từ VietQR (QuickLink) - Tự động điền số tiền và nội dung
   const qrUrl = `https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NO}-compact2.jpg?amount=${totalAmount}&addInfo=DH${ORDER_ID}&accountName=${encodeURIComponent(
     ACCOUNT_NAME
   )}`;
 
-  // Nếu không có sản phẩm nào (người dùng gõ link trực tiếp) -> Báo lỗi & Quay về
+  // --- CHẶN RENDER NẾU CHƯA LOGIN ---
+  if (!isAuthReady)
+    return (
+      <div style={{ textAlign: "center", padding: "50px" }}>
+        Đang kiểm tra đăng nhập...
+      </div>
+    );
+  if (!user) return null; 
+  
   if (orderItems.length === 0) {
     return (
       <div className="checkout-container error">
@@ -94,7 +96,6 @@ const CheckoutPage = () => {
   const saveOrderToHistory = async () => {
     try {
       const token = localStorage.getItem("token");
-      // Nếu không có token (chưa đăng nhập), có thể bỏ qua hoặc yêu cầu đăng nhập
       if (!token) return;
 
       await fetch("/api/user/orders", {
@@ -118,7 +119,6 @@ const CheckoutPage = () => {
               : "Chuyển khoản ngân hàng",
         }),
       });
-      // Không cần chờ kết quả trả về để UI mượt mà hơn
     } catch (err) {
       console.error("Lỗi lưu đơn hàng:", err);
     }
@@ -127,27 +127,19 @@ const CheckoutPage = () => {
   const handlePayment = (e) => {
     e.preventDefault();
     if (paymentMethod === "banking") {
-      // Nếu chọn chuyển khoản -> Hiện QR để quét
       setShowQR(true);
     } else {
-      // Nếu chọn COD -> Hoàn thành đơn hàng luôn
       finishOrder();
     }
   };
 
-  // Hoàn tất đơn hàng
   const finishOrder = async () => {
-    // 1. Gọi API lưu vào lịch sử (chạy ngầm)
     await saveOrderToHistory();
-    // 2. Hiển thị thông báo thành công
     setIsSuccess(true);
     setShowQR(false);
 
-    // 3. Chuyển hướng sau 2 giây
     setTimeout(() => {
       alert(`Đặt hàng thành công! Mã đơn: DH${ORDER_ID}`);
-      // Nếu có hàm clearCart từ context thì gọi ở đây để xóa giỏ hàng
-      // clearCart();
       navigate("/");
     }, 2000);
   };
@@ -159,14 +151,31 @@ const CheckoutPage = () => {
       </button>
 
       <div className="checkout-grid">
-        {/* CỘT TRÁI: THÔNG TIN GIAO HÀNG */}
         <div className="checkout-left">
           <h2 className="section-title">Thông tin giao hàng</h2>
           <form id="checkout-form" onSubmit={handlePayment}>
+            {/* --- 5. SỬA ĐỔI: ĐIỀN TỰ ĐỘNG TÊN USER --- */}
             <div className="form-group">
               <label>Họ và tên</label>
-              <input type="text" placeholder="Nguyễn Văn A" required />
+              <input
+                type="text"
+                defaultValue={user.name} // Điền sẵn tên
+                placeholder="Nguyễn Văn A"
+                required
+              />
             </div>
+            {/* --- 6. SỬA ĐỔI: HIỆN EMAIL USER (READONLY) --- */}
+            <div className="form-group">
+              <label>Email nhận thông báo</label>
+              <input
+                type="email"
+                value={user.email} // Điền sẵn email
+                disabled
+                style={{ backgroundColor: "#f3f4f6", cursor: "not-allowed" }}
+              />
+            </div>
+            {/* ----------------------------------------------- */}
+
             <div className="form-group">
               <label>Số điện thoại</label>
               <input type="tel" placeholder="09xxxxxxxxx" required />
@@ -233,7 +242,6 @@ const CheckoutPage = () => {
           </form>
         </div>
 
-        {/* CỘT PHẢI: DANH SÁCH SẢN PHẨM */}
         <div className="checkout-right">
           <div className="order-summary">
             <h3>Đơn hàng ({orderItems.length} sản phẩm)</h3>
@@ -253,7 +261,6 @@ const CheckoutPage = () => {
                       }}
                     >
                       <p className="product-price">{formatPrice(item.price)}</p>
-                      {/* Hiển thị số lượng nếu có, mặc định là 1 */}
                       <span
                         style={{
                           fontSize: "13px",
@@ -296,7 +303,6 @@ const CheckoutPage = () => {
         </div>
       </div>
 
-      {/* --- POPUP HIỂN THỊ MÃ QR (Chỉ hiện khi chọn Banking và bấm Thanh toán) --- */}
       {showQR && (
         <div className="qr-overlay">
           <div className="qr-modal">
@@ -321,7 +327,7 @@ const CheckoutPage = () => {
 
             <div className="qr-actions">
               <button onClick={() => setShowQR(false)} className="btn-cancel">
-                Quay lại
+                Hủy bỏ
               </button>
               <button onClick={finishOrder} className="btn-done">
                 Đã chuyển khoản xong

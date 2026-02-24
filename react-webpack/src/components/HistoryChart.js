@@ -9,7 +9,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import "./style.css"; // Hoặc file css riêng nếu cần
+import "./style.css"; 
 
 // Các tham số vẽ biểu đồ (Key phải khớp với dữ liệu trả về từ Open-Meteo trong airQualityService.js)
 const CHARTABLE_PARAMS = [

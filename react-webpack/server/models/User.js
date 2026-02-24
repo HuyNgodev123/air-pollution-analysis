@@ -33,6 +33,11 @@ const UserSchema = new mongoose.Schema(
       default: "user", // Mặc định ai đăng ký cũng là 'user'
       enum: ["user", "admin"], // Chỉ chấp nhận 2 giá trị này
     },
+
+    resetPasswordToken: String,
+
+    resetPasswordExpire: Date,
+    
     searchHistory: [
       {
         cityLabel: String, // Tên hiển thị (VD: Hanoi, Vietnam)
