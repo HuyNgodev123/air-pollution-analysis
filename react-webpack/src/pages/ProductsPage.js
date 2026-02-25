@@ -88,7 +88,11 @@ const SEED_DATA = [
   },
 ];
 
-const API_URL = "http://localhost:5000/api/products";
+const BASE_URL = window.location.hostname === 'localhost' 
+    ? 'http://localhost:5000' 
+    : 'https://air-pollution-analysis.onrender.com';
+
+const API_URL = `${BASE_URL}/api/products`;
 
 const ProductsPage = () => {
   const { user } = useAuth();

@@ -12,7 +12,7 @@ import user from './routes/user.js';
 
 const app = express();
 app.use(cors({
-    origin: '*', 
+    origin: true, 
     credentials: true
 }));
 app.use(express.json());
